@@ -9,11 +9,11 @@ debug:
 
 archive:
 	gcc -c astring.c
-	ar rcs astring.o 
+	ar rcs astring.a astring.o
 
 archive_debug:
-	gcc -c astring.c -gcc
-	ar rcs astring.o
-	
+	gcc -c astring.c -g
+	ar rcs astring.a astring.o
+
 clean:
 	rm *.o *.a
