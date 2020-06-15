@@ -37,7 +37,6 @@ If you like to add to this library just submit a PR.
 
 
 ## Inspiring Quotes
+I do not fear computers. I fear lack of them.
 
-I choose a lazy person to do a hard job. Because a lazy person will find an easy way to do it.
- 
- - Bill Gates
+ - Isaac Asimov
