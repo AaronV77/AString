@@ -27,9 +27,9 @@ merge the files into your source directory.
 
 ## Testing
 
-There are no tests yet for this library but they are on my radar to do. 
-
-## Contributing
+There are tests for this library and are located in the test directory. You will have to build the library, copy the tester file to the src directory, and then run the output file. The commit 0dc4824 has been memory checked and is completely Valgrind compliant with no issues. 
+ 
+ ## Contributing
 
 If you like to add to this library just submit a PR. 
 
