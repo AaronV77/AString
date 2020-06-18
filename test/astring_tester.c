@@ -2,8 +2,7 @@
 
 int main() { 
     int test_id = 0;
-    string * cstring;
-    salloc(&cstring, 256, 1);
+    string * cstring = salloc(256, 1);
 
     // Test-1 (salloc)
     test_id = 1;
