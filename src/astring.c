@@ -78,7 +78,9 @@ int salloc(string ** array, int number_of_columns, int col_incrementation) {
     
 	if (col_incrementation < 0)
 		(*array)->col_incrementation = 0;
-    
+    else 
+        (*array)->col_incrementation = col_incrementation;
+        
     (*array)->array = calloc((*array)->total_num_cols, sizeof(char));
     if (!(*array)->array) {
         printf("ERROR: Calloc has failed...\n");
@@ -144,7 +146,8 @@ int sadd(string ** array, const char * format, ...) {
         (*array)->total_num_cols = temp_length + (*array)->col_incrementation;
         column_reallocation(array, (*array)->total_num_cols);
     }
-    (*array)->current_num_col = temp_length;
+    // Need to subtract one from the temp length due to its addition of the null terminator.
+    (*array)->current_num_col = (temp_length - 1);
     
     strcat((*array)->array, (char*)vptr);
 
@@ -204,30 +207,40 @@ int stokenize(string ** array, char token_char) {
 
 	if (string_debugger_flag) printf("Entering the stokenize function.\n");
 
-    char * token;
-    int character_ocrrurences = soccurences((*array), token_char);
-    if (character_ocrrurences) {
-        (*array)->tokens = calloc(character_ocrrurences, sizeof(char*));
+    int character_occurences = soccurences((*array), token_char);
+    if (character_occurences) {
+        // Have to add another one to the character_occurences because of the extra token at the end.
+        (*array)->tokens = calloc(character_occurences + 1, sizeof(char*));
         if (!(*array)->tokens) {
             printf("ERROR: There was an issue with the first calloc call.\n");
             return 1;
         }
 
-        char * line = strdup((*array)->array);
-        token = strtok(line, &token_char);
-        while(token != NULL) {
-            (*array)->tokens[(*array)->total_num_tokens] = calloc(strlen(token) + 1, sizeof(char));
-            if (!(*array)->tokens[(*array)->total_num_tokens]) {
-                printf("ERROR: There was an issue with the second calloc call.\n");
-                return 1;
+        int token_iterator = 0;
+        char * token = calloc(256, sizeof(char));
+        for (int i = 0; i < (*array)->current_num_col; i++) {
+            // Have to check to see if we are at the end of the string to grab the last token.
+            if (((*array)->array[i] == token_char) || (i == ((*array)->current_num_col - 1))) {
+                // Add the last character to the token since we are at the end of the string.
+                if (i == (*array)->current_num_col -1)
+                    token[token_iterator] = (*array)->array[i];
+                (*array)->tokens[(*array)->total_num_tokens] = calloc(strlen(token) + 1, sizeof(char));
+                if (!(*array)->tokens[(*array)->total_num_tokens]) {
+                    printf("ERROR: There was an issue with the second calloc call.\n");
+                    return 1;
+                }
+
+                strcpy((*array)->tokens[(*array)->total_num_tokens], token);
+                (*array)->total_num_tokens++;  
+                memset(token, 0, 256 * sizeof(char));          
+                token_iterator = 0;
+            } else {
+                token[token_iterator] = (*array)->array[i];
+                token_iterator++;
             }
-
-            strcpy((*array)->tokens[(*array)->total_num_tokens], token);
-            (*array)->total_num_tokens++;
-            token = strtok(NULL, &token_char);
         }
-        free(line);
 
+        free(token);
     } else {
         printf("ERROR: There were no characters found like that in the following string: %s\n", (*array)->array);
         return 1;
@@ -298,7 +311,14 @@ void sremove_leading_and_trailing_spaces(string ** array) {
         if ((*array)->array[i] > 32 && (*array)->array[i] < 127)
             ending_point = i;
     }
-    strncpy((*array)->array, &(*array)->array[starting_point], (*array)->current_num_col - starting_point);
+    // I tried the case of just using strncpy to move the content of the string to the beginning of the string but
+    // - this causes an issue in valgrind / low level memory. The error is: __strcpy_sse2_unaligned
+    char * temp = calloc(((*array)->current_num_col - starting_point) + 1, sizeof(char));
+    strncpy(temp, &(*array)->array[starting_point], (*array)->current_num_col - starting_point);
+    sclear(array);
+    sadd(array, "string", temp);
+    free(temp);
+
     ending_point -= starting_point;
     (*array)->current_num_col -= starting_point;                       
     (*array)->array[ending_point + 1] = '\0';
