@@ -19,6 +19,18 @@ int main() {
         return 1;
     }
 
+    sfree(&cstring);
+    cstring = salloc(NULL, 256, 1);
+    if (cstring->col_incrementation != 1) {
+        printf("Test-%d-3 Failure: The string structure col_incrementation is %d and should be %d.\n", test_id, cstring->col_incrementation, 1);
+        return 1;
+    }
+
+    if (cstring->total_num_cols != 256) {
+        printf("Test-%d-4 Failure: The string structure total_num_cols is %d and should be %d.\n", test_id, cstring->total_num_cols, 256);
+        return 1;
+    }
+
     // Test-2 (sadd)
     test_id = 2;
     printf("Testing sadd...\n");
