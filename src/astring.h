@@ -26,7 +26,7 @@ typedef struct string {
 
 // int column_reallocation(string ** array, int new_col_size); (Static)
 
-string * salloc(string ** array, int number_of_columns, int col_incrementation);
+string * salloc(int number_of_columns, int col_incrementation);
 
 int sadd(string ** array, const char * format, ...);
 

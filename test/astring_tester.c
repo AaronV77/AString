@@ -2,8 +2,7 @@
 
 int main() { 
     int test_id = 0;
-    string * cstring;
-    salloc(&cstring, 256, 1);
+    string * cstring = salloc(256, 1);
 
     // Test-1 (salloc)
     test_id = 1;
@@ -16,18 +15,6 @@ int main() {
 
     if (cstring->total_num_cols != 256) {
         printf("Test-%d-2 Failure: The string structure total_num_cols is %d and should be %d.\n", test_id, cstring->total_num_cols, 256);
-        return 1;
-    }
-
-    sfree(&cstring);
-    cstring = salloc(NULL, 256, 1);
-    if (cstring->col_incrementation != 1) {
-        printf("Test-%d-3 Failure: The string structure col_incrementation is %d and should be %d.\n", test_id, cstring->col_incrementation, 1);
-        return 1;
-    }
-
-    if (cstring->total_num_cols != 256) {
-        printf("Test-%d-4 Failure: The string structure total_num_cols is %d and should be %d.\n", test_id, cstring->total_num_cols, 256);
         return 1;
     }
 

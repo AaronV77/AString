@@ -51,78 +51,45 @@ int column_reallocation(string ** array, int new_col_size) {
 
 //-----------------------------------------------------------------------------------------------------
 /**
- * This function will take in a empty string structure and setup / allocate memory. There are default values
- * to this function that if the number of columns is zero or less, then the default is 20 in size. If the 
- * amount of col_incrementation is less than zero, then the default value is zero. This parameter controls
- * how well the library runs when adding more data to the char pointer in the string structure.
+ * This function will take two integers that will tell the function how many characters the user wants
+ * the string structure char pointer to have and how many characters to increase the char pointer by
+ * when space runs out. If either integer is less than zero then a default value of zero is assigned to
+ * either of them in the string structure.
  *
  * \param[in] array: is a string structure.
  * \param[in] number_of_columns: is an integer that holds how many elements need to be in the char pointer.
  * \param[in] col_incrementation: is a integer that tells the library how many elements need to be incremented to the pointer when the pointer is filled with data. 
- * \param[out] return (on success): will be an integer value of zero.
- * \param[out] return (on failure): will be an integer value of one.
+ * \param[out] return (on success): will be a string structure pointer.
+ * \param[out] return (on failure): will be a NULL value.
  */
-string * salloc(string ** array, int number_of_columns, int col_incrementation) {
+string * salloc(int number_of_columns, int col_incrementation) {
 
 	if (string_debugger_flag) printf("Entering the salloc.\n");
 
-    // Rather than checking to see if the memory pointer that is getting passed in, I will just allocate to it no matter what.
-    // Your application will be leaking if you don't send in a fresh or clean array pointer. 
+    string * ptr = calloc(1, sizeof(string));
 
-    if (array) {
+    if (number_of_columns <= 0)
+        ptr->total_num_cols = 20;
+    else
+        ptr->total_num_cols = number_of_columns;
 
-        (*array) = calloc(1, sizeof(string));
+    if (col_incrementation < 0)
+        ptr->col_incrementation = 0;
+    else 
+        ptr->col_incrementation = col_incrementation;
 
-        if (number_of_columns <= 0)
-            (*array)->total_num_cols = 20;
-        else
-            (*array)->total_num_cols = number_of_columns;
-        
-        if (col_incrementation < 0)
-            (*array)->col_incrementation = 0;
-        else 
-            (*array)->col_incrementation = col_incrementation;
-
-        (*array)->array = calloc((*array)->total_num_cols, sizeof(char));
-        if (!(*array)->array) {
-            printf("ERROR: Calloc has failed...\n");
-            if (string_debugger_flag) printf("Leaving the salloc function.\n");
-            return NULL;
-        }
-        
-        (*array)->tokens = NULL;
-        (*array)->total_num_tokens = 0;
-
+    ptr->array = calloc(ptr->total_num_cols, sizeof(char));
+    if (!ptr->array) {
+        printf("ERROR: Calloc has failed...\n");
         if (string_debugger_flag) printf("Leaving the salloc function.\n");
         return NULL;
-    
-    }  else {
-
-        string * ptr = calloc(1, sizeof(string));
-
-        if (number_of_columns <= 0)
-            ptr->total_num_cols = 20;
-        else
-            ptr->total_num_cols = number_of_columns;
-        
-        if (col_incrementation < 0)
-            ptr->col_incrementation = 0;
-        else 
-            ptr->col_incrementation = col_incrementation;
-        
-        ptr->array = calloc(ptr->total_num_cols, sizeof(char));
-        if (!ptr->array) {
-            printf("ERROR: Calloc has failed...\n");
-            if (string_debugger_flag) printf("Leaving the salloc function.\n");
-            return NULL;
-        }
-        
-        ptr->tokens = NULL;
-        ptr->total_num_tokens = 0;
-        
-        if (string_debugger_flag) printf("Leaving the salloc function.\n");
-        return ptr;
     }
+
+    ptr->tokens = NULL;
+    ptr->total_num_tokens = 0;
+
+    if (string_debugger_flag) printf("Leaving the salloc function.\n");
+    return ptr;
 }
 
 //-----------------------------------------------------------------------------------------------------
