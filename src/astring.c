@@ -205,6 +205,15 @@ int stokenize(string ** array, char token_char) {
 
     int character_occurences = soccurences((*array), token_char);
     if (character_occurences) {
+
+        if ((*array)->tokens) {
+            for (int i = 0; i < (*array)->total_num_tokens; ++i)
+                free((*array)->tokens[i]);
+            free((*array)->tokens);
+            (*array)->tokens = NULL;
+            (*array)->total_num_tokens = 0;
+        }
+
         // Have to add another one to the character_occurences because of the extra token at the end.
         (*array)->tokens = calloc(character_occurences + 1, sizeof(char*));
         if (!(*array)->tokens) {
@@ -235,7 +244,6 @@ int stokenize(string ** array, char token_char) {
                 token_iterator++;
             }
         }
-
         free(token);
     } else {
         printf("ERROR: There were no characters found like that in the following string: %s\n", (*array)->array);
