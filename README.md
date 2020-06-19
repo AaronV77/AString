@@ -13,7 +13,7 @@ Just follow the upcoming sections they should make startup very clear.
 
 ## Warnings
 
-This library is not responsible for any mistakes that it may contain within the source code. 
+This library is not responsible for any mistakes that it may cause.
 
 ## Prerequisites
 
