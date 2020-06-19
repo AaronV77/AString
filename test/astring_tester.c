@@ -155,6 +155,18 @@ int main() {
         printf("Test-%d-2 Failure: The current_num_col in the string structure is %d and should be %d.\n", test_id, cstring->current_num_col, strlen("Aaron Valoroso"));
         return 1;
     }
+
+    sremove_leading_and_trailing_spaces(&cstring);
+    if (strcmp(cstring->array, "Aaron Valoroso")) {
+        printf("Test-%d-3 Failure: The char pointer in the string structure is %s and should be %s.\n", test_id, cstring->array, "Aaron Valoroso");
+        return 1;
+    }
+
+    if (cstring->current_num_col != strlen("Aaron Valoroso")) {
+        printf("Test-%d-4 Failure: The current_num_col in the string structure is %d and should be %d.\n", test_id, cstring->current_num_col, strlen("Aaron Valoroso"));
+        return 1;
+    }    
+
     // This is for the next test.
     stokenize(&cstring, ' ');
 
