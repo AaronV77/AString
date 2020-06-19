@@ -73,7 +73,23 @@ int main() {
         printf("Test-%d-3 Failure: The second token in the string structure tokens is %s and should be %s.\n", test_id, cstring->tokens[1], "Valoroso");
         return 1;
     }
-    
+    printf("Here...\n");
+    stokenize(&cstring, ' ');
+    if (cstring->total_num_tokens != 2) {
+        printf("Test-%d-4 Failure: The total_num_tokens in the string structure is %d and should be %d.\n", test_id, cstring->total_num_tokens, 2);
+        return 1;
+    }
+
+    if (strcmp(cstring->tokens[0], "Aaron")) {
+        printf("Test-%d-5 Failure: The first token in the string structure tokens is %s and should be %s.\n", test_id, cstring->tokens[0], "Aaron");
+        return 1;
+    }
+
+    if (strcmp(cstring->tokens[1], "Valoroso")) {
+        printf("Test-%d-6 Failure: The second token in the string structure tokens is %s and should be %s.\n", test_id, cstring->tokens[1], "Valoroso");
+        return 1;
+    }
+
     // Test-5 (strunc)
     test_id = 5;
     printf("Testing strunc...\n");
