@@ -300,13 +300,15 @@ void sremove_leading_and_trailing_spaces(string ** array) {
 
 	if (string_debugger_flag) printf("Entering the sremove_leading_and_trailing_spaces function.\n");
 
-    int starting_point = 0, ending_point = 0;
+    int starting_point = -1, ending_point = 0;
     for (int i = 0; i < (*array)->current_num_col; ++i) {
-        if (!starting_point && ((*array)->array[i] > 32 && (*array)->array[i] < 127))
+        // This if statment is just suppose to grab the first character and then stop grabbing anymore after. 
+        if (starting_point == -1 && ((*array)->array[i] > 32 && (*array)->array[i] < 127))
             starting_point = i;
         if ((*array)->array[i] > 32 && (*array)->array[i] < 127)
             ending_point = i;
     }
+    
     // I tried the case of just using strncpy to move the content of the string to the beginning of the string but
     // - this causes an issue in valgrind / low level memory. The error is: __strcpy_sse2_unaligned
     char * temp = calloc(((*array)->current_num_col - starting_point) + 1, sizeof(char));
