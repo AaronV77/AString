@@ -302,6 +302,7 @@ void sremove_leading_and_trailing_spaces(string ** array) {
 
     int starting_point = -1, ending_point = 0;
     for (int i = 0; i < (*array)->current_num_col; ++i) {
+        // This if statment is just suppose to grab the first character and then stop grabbing anymore after. 
         if (starting_point == -1 && ((*array)->array[i] > 32 && (*array)->array[i] < 127))
             starting_point = i;
         if ((*array)->array[i] > 32 && (*array)->array[i] < 127)
