@@ -30,6 +30,8 @@ string * salloc(int number_of_columns, int col_incrementation);
 
 int sadd(string ** array, const char * format, ...);
 
+int sinsert(string ** array, int position, const char * format, ...);
+
 int soccurences(string * array, char find_char);
 
 int stokenize(string ** array, char token_char);

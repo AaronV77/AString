@@ -96,7 +96,7 @@ string * salloc(int number_of_columns, int col_incrementation) {
 /**
  * This function will take a string structure char pointer and add either a char or a char pointer to
  * the data within the structure. A void pointer is used due to the unknown type of data, and only
- * a char or char pointer is accpeted. The current length of the char pointer, the incoming lenght of
+ * a char or char pointer is accepted. The current length of the char pointer, the incoming length of
  * the data and null terminator is checked against the amount of memory that is allocated for the char
  * pointer in the string structure. If there is no room for the incoming data then the function will
  * Take the combination of lenghts and add the col_incrementation to it, and resize the char pointer in
@@ -153,6 +153,76 @@ int sadd(string ** array, const char * format, ...) {
 	if (string_debugger_flag) printf("Leaving the sadd funtion.\n");
 
 	return 0;
+}
+
+//-----------------------------------------------------------------------------------------------------
+/**
+ * This function will take a string structure char pointer and insert either a char or a char pointer to
+ * the data within the structure. This function was created because of the sadd function not being able to
+ * add characters in the beginning of the string.A void pointer is used due to the unknown type of data, 
+ * and only a char or char pointer is accepted. The current length of the char pointer, the incoming length 
+ * of the data and null terminator is checked against the amount of memory that is allocated for the char
+ * pointer in the string structure. If there is no room for the incoming data then the function will
+ * Take the combination of lenghts and add the col_incrementation to it, and resize the char pointer in
+ * the string structure. I've debated on keeping the col_incremntation and left it in to allow the user
+ * to control how well this library runs. If the user gives a small to zero number, then the library will
+ * constantly have to keep allocating for more memory to the pointer, else if they give a big number
+ * then less allocates will have to be made (saving some time).
+ *
+ * \param[in] array: is a string structure.
+ * \param[in] position: is an integer that tells the function where to insert the incoming data.
+ * \param[in] format: is a const char pointer that stores the datatype for the incoming data.
+ * \param[in] ...: is either a char or a char pointer of data, nothing else is accpeted.
+ * \param[out] return (on success): will be an integer value of zero.
+ * \param[out] return (on failure): will be an integer value of one.
+ */
+int sinsert(string ** array, int position, const char * format, ...) {
+
+	if (string_debugger_flag) printf("Entering the sinsert funtion.\n");
+	void * vptr;
+	va_list arguments;
+	va_start(arguments, format);
+
+    // Grab the characters that are to be added to the end of a string.
+	if (!strcmp(format, "char")) {
+        char * var = calloc(2, sizeof(char));
+		var[0] = va_arg(arguments, int);
+        vptr = var;
+    } else if (!strcmp(format, "string")) {
+        char * string = va_arg(arguments, char*);
+        char * string2 = calloc(strlen(string) + 1, sizeof(char));
+        strncpy(string2, string, strlen(string));
+        vptr = string2;
+ 	} else {
+		printf("ERROR: The given data type is not supported...\n");
+		if (string_debugger_flag) printf("Leaving the sadd funtion.\n");
+		va_end(arguments);
+		return 1;
+    }
+
+    // At this point vptr should all be a char pointer
+    int temp_length = (*array)->current_num_col + strlen((char*)vptr) + 1;
+    if ((*array)->total_num_cols < temp_length) {
+        (*array)->total_num_cols = temp_length + (*array)->col_incrementation;
+        column_reallocation(array, (*array)->total_num_cols);
+    }
+    // Need to subtract one from the temp length due to its addition of the null terminator.
+    (*array)->current_num_col = (temp_length - 1);
+
+    char * temp = calloc((*array)->current_num_col + 1, sizeof(char));
+    strncpy(temp, (*array)->array, position * sizeof(char));
+    strcat(temp, (char*)vptr);
+    strncat(temp, &(*array)->array[position], ((*array)->current_num_col - (position + strlen((char*)vptr))) * sizeof(char));
+    memset((*array)->array, 0, (*array)->current_num_col * sizeof(char));
+    strcpy((*array)->array, temp);
+
+    free(temp);
+	va_end(arguments);
+    free(vptr);
+
+    if (string_debugger_flag) printf("Leaving the sinsert funtion.\n");
+    
+    return 0;
 }
 
 //-----------------------------------------------------------------------------------------------------
