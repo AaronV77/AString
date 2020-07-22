@@ -115,41 +115,45 @@ int sadd(string ** array, const char * format, ...) {
 
 	if (string_debugger_flag) printf("Entering the sadd function.\n");
 
-	void * vptr;
-	va_list arguments;
-	va_start(arguments, format);
+    if ((*array)) {
+        void * vptr;
+        va_list arguments;
+        va_start(arguments, format);
 
-    // Grab the characters that are to be added to the end of a string.
-	if (!strcmp(format, "char")) {
-        char * var = calloc(2, sizeof(char));
-		var[0] = va_arg(arguments, int);
-        vptr = var;
-    } else if (!strcmp(format, "string")) {
-        char * string = va_arg(arguments, char*);
-        char * string2 = calloc(strlen(string) + 1, sizeof(char));
-        strncpy(string2, string, strlen(string));
-        vptr = string2;
- 	} else {
-		printf("ERROR: The given data type is not supported...\n");
-		if (string_debugger_flag) printf("Leaving the sadd funtion.\n");
-		va_end(arguments);
-		return 1;
-    }
+        // Grab the characters that are to be added to the end of a string.
+        if (!strcmp(format, "char")) {
+            char * var = calloc(2, sizeof(char));
+            var[0] = va_arg(arguments, int);
+            vptr = var;
+        } else if (!strcmp(format, "string")) {
+            char * string = va_arg(arguments, char*);
+            char * string2 = calloc(strlen(string) + 1, sizeof(char));
+            strncpy(string2, string, strlen(string));
+            vptr = string2;
+        } else {
+            printf("ERROR: The given data type is not supported...\n");
+            if (string_debugger_flag) printf("Leaving the sadd funtion.\n");
+            va_end(arguments);
+            return 1;
+        }
 
-    // At this point vptr should all be a char pointer
-    int temp_length = (*array)->current_num_col + strlen((char*)vptr) + 1;
-    if ((*array)->total_num_cols < temp_length) {
-        (*array)->total_num_cols = temp_length + (*array)->col_incrementation;
-        column_reallocation(array, (*array)->total_num_cols);
+        // At this point vptr should all be a char pointer
+        int temp_length = (*array)->current_num_col + strlen((char*)vptr) + 1;
+        if ((*array)->total_num_cols < temp_length) {
+            (*array)->total_num_cols = temp_length + (*array)->col_incrementation;
+            column_reallocation(array, (*array)->total_num_cols);
+        }
+        // Need to subtract one from the temp length due to its addition of the null terminator.
+        (*array)->current_num_col = (temp_length - 1);
+        
+        strcat((*array)->array, (char*)vptr);
+
+        va_end(arguments);
+        free(vptr);
+    } else {
+        if (string_debugger_flag) printf("WARNING: You sent in a NULL pointer...\n");
     }
-    // Need to subtract one from the temp length due to its addition of the null terminator.
-    (*array)->current_num_col = (temp_length - 1);
     
-    strcat((*array)->array, (char*)vptr);
-
-	va_end(arguments);
-    free(vptr);
-
 	if (string_debugger_flag) printf("Leaving the sadd funtion.\n");
 
 	return 0;
@@ -179,46 +183,51 @@ int sadd(string ** array, const char * format, ...) {
 int sinsert(string ** array, int position, const char * format, ...) {
 
 	if (string_debugger_flag) printf("Entering the sinsert funtion.\n");
-	void * vptr;
-	va_list arguments;
-	va_start(arguments, format);
 
-    // Grab the characters that are to be added to the end of a string.
-	if (!strcmp(format, "char")) {
-        char * var = calloc(2, sizeof(char));
-		var[0] = va_arg(arguments, int);
-        vptr = var;
-    } else if (!strcmp(format, "string")) {
-        char * string = va_arg(arguments, char*);
-        char * string2 = calloc(strlen(string) + 1, sizeof(char));
-        strncpy(string2, string, strlen(string));
-        vptr = string2;
- 	} else {
-		printf("ERROR: The given data type is not supported...\n");
-		if (string_debugger_flag) printf("Leaving the sadd funtion.\n");
-		va_end(arguments);
-		return 1;
+    if ((*array)) {
+        void * vptr;
+        va_list arguments;
+        va_start(arguments, format);
+
+        // Grab the characters that are to be added to the end of a string.
+        if (!strcmp(format, "char")) {
+            char * var = calloc(2, sizeof(char));
+            var[0] = va_arg(arguments, int);
+            vptr = var;
+        } else if (!strcmp(format, "string")) {
+            char * string = va_arg(arguments, char*);
+            char * string2 = calloc(strlen(string) + 1, sizeof(char));
+            strncpy(string2, string, strlen(string));
+            vptr = string2;
+        } else {
+            printf("ERROR: The given data type is not supported...\n");
+            if (string_debugger_flag) printf("Leaving the sadd funtion.\n");
+            va_end(arguments);
+            return 1;
+        }
+
+        // At this point vptr should all be a char pointer
+        int temp_length = (*array)->current_num_col + strlen((char*)vptr) + 1;
+        if ((*array)->total_num_cols < temp_length) {
+            (*array)->total_num_cols = temp_length + (*array)->col_incrementation;
+            column_reallocation(array, (*array)->total_num_cols);
+        }
+        // Need to subtract one from the temp length due to its addition of the null terminator.
+        (*array)->current_num_col = (temp_length - 1);
+
+        char * temp = calloc((*array)->current_num_col + 1, sizeof(char));
+        strncpy(temp, (*array)->array, position * sizeof(char));
+        strcat(temp, (char*)vptr);
+        strncat(temp, &(*array)->array[position], ((*array)->current_num_col - (position + strlen((char*)vptr))) * sizeof(char));
+        memset((*array)->array, 0, (*array)->current_num_col * sizeof(char));
+        strcpy((*array)->array, temp);
+
+        free(temp);
+        va_end(arguments);
+        free(vptr);
+    } else {
+        if (string_debugger_flag) printf("WARNING: You sent in a NULL pointer...\n");
     }
-
-    // At this point vptr should all be a char pointer
-    int temp_length = (*array)->current_num_col + strlen((char*)vptr) + 1;
-    if ((*array)->total_num_cols < temp_length) {
-        (*array)->total_num_cols = temp_length + (*array)->col_incrementation;
-        column_reallocation(array, (*array)->total_num_cols);
-    }
-    // Need to subtract one from the temp length due to its addition of the null terminator.
-    (*array)->current_num_col = (temp_length - 1);
-
-    char * temp = calloc((*array)->current_num_col + 1, sizeof(char));
-    strncpy(temp, (*array)->array, position * sizeof(char));
-    strcat(temp, (char*)vptr);
-    strncat(temp, &(*array)->array[position], ((*array)->current_num_col - (position + strlen((char*)vptr))) * sizeof(char));
-    memset((*array)->array, 0, (*array)->current_num_col * sizeof(char));
-    strcpy((*array)->array, temp);
-
-    free(temp);
-	va_end(arguments);
-    free(vptr);
 
     if (string_debugger_flag) printf("Leaving the sinsert funtion.\n");
     
@@ -241,9 +250,13 @@ int soccurences(string * array, char find_char) {
 	if (string_debugger_flag) printf("Entering the soccurences function.\n");
 
     int total_occurences = 0;
-    for (int i = 0; i < array->current_num_col; ++i) {
-        if (array->array[i] == find_char)
-            total_occurences++;
+    if (array) {
+        for (int i = 0; i < array->current_num_col; ++i) {
+            if (array->array[i] == find_char)
+                total_occurences++;
+        }
+    } else {
+        if (string_debugger_flag) printf("WARNING: You sent in a NULL pointer...\n");
     }
 
 	if (string_debugger_flag) printf("Leaving the soccurences function.\n");
@@ -273,51 +286,55 @@ int stokenize(string ** array, char token_char) {
 
 	if (string_debugger_flag) printf("Entering the stokenize function.\n");
 
-    int character_occurences = soccurences((*array), token_char);
-    if (character_occurences) {
+    if ((*array)) {
+        int character_occurences = soccurences((*array), token_char);
+        if (character_occurences) {
 
-        if ((*array)->tokens) {
-            for (int i = 0; i < (*array)->total_num_tokens; ++i)
-                free((*array)->tokens[i]);
-            free((*array)->tokens);
-            (*array)->tokens = NULL;
-            (*array)->total_num_tokens = 0;
-        }
+            if ((*array)->tokens) {
+                for (int i = 0; i < (*array)->total_num_tokens; ++i)
+                    free((*array)->tokens[i]);
+                free((*array)->tokens);
+                (*array)->tokens = NULL;
+                (*array)->total_num_tokens = 0;
+            }
 
-        // Have to add another one to the character_occurences because of the extra token at the end.
-        (*array)->tokens = calloc(character_occurences + 1, sizeof(char*));
-        if (!(*array)->tokens) {
-            printf("ERROR: There was an issue with the first calloc call.\n");
+            // Have to add another one to the character_occurences because of the extra token at the end.
+            (*array)->tokens = calloc(character_occurences + 1, sizeof(char*));
+            if (!(*array)->tokens) {
+                printf("ERROR: There was an issue with the first calloc call.\n");
+                return 1;
+            }
+
+            int token_iterator = 0;
+            char * token = calloc(256, sizeof(char));
+            for (int i = 0; i < (*array)->current_num_col; i++) {
+                // Have to check to see if we are at the end of the string to grab the last token.
+                if (((*array)->array[i] == token_char) || (i == ((*array)->current_num_col - 1))) {
+                    // Add the last character to the token since we are at the end of the string.
+                    if (i == (*array)->current_num_col -1)
+                        token[token_iterator] = (*array)->array[i];
+                    (*array)->tokens[(*array)->total_num_tokens] = calloc(strlen(token) + 1, sizeof(char));
+                    if (!(*array)->tokens[(*array)->total_num_tokens]) {
+                        printf("ERROR: There was an issue with the second calloc call.\n");
+                        return 1;
+                    }
+
+                    strcpy((*array)->tokens[(*array)->total_num_tokens], token);
+                    (*array)->total_num_tokens++;  
+                    memset(token, 0, 256 * sizeof(char));          
+                    token_iterator = 0;
+                } else {
+                    token[token_iterator] = (*array)->array[i];
+                    token_iterator++;
+                }
+            }
+            free(token);
+        } else {
+            printf("ERROR: There were no characters found like that in the following string: %s\n", (*array)->array);
             return 1;
         }
-
-        int token_iterator = 0;
-        char * token = calloc(256, sizeof(char));
-        for (int i = 0; i < (*array)->current_num_col; i++) {
-            // Have to check to see if we are at the end of the string to grab the last token.
-            if (((*array)->array[i] == token_char) || (i == ((*array)->current_num_col - 1))) {
-                // Add the last character to the token since we are at the end of the string.
-                if (i == (*array)->current_num_col -1)
-                    token[token_iterator] = (*array)->array[i];
-                (*array)->tokens[(*array)->total_num_tokens] = calloc(strlen(token) + 1, sizeof(char));
-                if (!(*array)->tokens[(*array)->total_num_tokens]) {
-                    printf("ERROR: There was an issue with the second calloc call.\n");
-                    return 1;
-                }
-
-                strcpy((*array)->tokens[(*array)->total_num_tokens], token);
-                (*array)->total_num_tokens++;  
-                memset(token, 0, 256 * sizeof(char));          
-                token_iterator = 0;
-            } else {
-                token[token_iterator] = (*array)->array[i];
-                token_iterator++;
-            }
-        }
-        free(token);
     } else {
-        printf("ERROR: There were no characters found like that in the following string: %s\n", (*array)->array);
-        return 1;
+        if (string_debugger_flag) printf("WARNING: You sent in a NULL pointer...\n");
     }
 
 	if (string_debugger_flag) printf("Leaving the stokenize function.\n");
@@ -343,20 +360,24 @@ void strunc(string ** array, int position, char character) {
 
 	if (string_debugger_flag) printf("Entering the strunc function.\n");
 
-    // If the position_or_char is bigger than the length of the string.
-    if (character) {
-        // Look of the first occurence of a letter and put a null terminator there.
-        for (int i = 0; i < (*array)->current_num_col; ++i) {
-            if ((*array)->array[i] == character) {
-                (*array)->array[i] = '\0';
-                (*array)->current_num_col = i;
-                break;
+    if ((*array)) {
+        // If the position_or_char is bigger than the length of the string.
+        if (character) {
+            // Look of the first occurence of a letter and put a null terminator there.
+            for (int i = 0; i < (*array)->current_num_col; ++i) {
+                if ((*array)->array[i] == character) {
+                    (*array)->array[i] = '\0';
+                    (*array)->current_num_col = i;
+                    break;
+                }
             }
+        } else {
+            // Put a null terminator at a specific place in the string. 
+            (*array)->array[position] = '\0';
+            (*array)->current_num_col = position;
         }
     } else {
-        // Put a null terminator at a specific place in the string. 
-        (*array)->array[position] = '\0';
-        (*array)->current_num_col = position;
+        if (string_debugger_flag) printf("WARNING: You sent in a NULL pointer...\n");
     }
 
 	if (string_debugger_flag) printf("Leaving the strunc funtion.\n");
@@ -378,28 +399,32 @@ void sremove_leading_and_trailing_spaces(string ** array) {
 
 	if (string_debugger_flag) printf("Entering the sremove_leading_and_trailing_spaces function.\n");
 
-    int starting_point = -1, ending_point = 0;
-    for (int i = 0; i < (*array)->current_num_col; ++i) {
-        // This if statment is just suppose to grab the first character and then stop grabbing anymore after. 
-        if (starting_point == -1 && ((*array)->array[i] > 32 && (*array)->array[i] < 127))
-            starting_point = i;
-        if ((*array)->array[i] > 32 && (*array)->array[i] < 127)
-            ending_point = i;
-    }
-    
-    // I tried the case of just using strncpy to move the content of the string to the beginning of the string but
-    // - this causes an issue in valgrind / low level memory. The error is: __strcpy_sse2_unaligned
-    char * temp = calloc(((*array)->current_num_col - starting_point) + 1, sizeof(char));
-    strncpy(temp, &(*array)->array[starting_point], (*array)->current_num_col - starting_point);
-    sclear(array);
-    sadd(array, "string", temp);
-    free(temp);
+    if ((*array)) {
+        int starting_point = -1, ending_point = 0;
+        for (int i = 0; i < (*array)->current_num_col; ++i) {
+            // This if statment is just suppose to grab the first character and then stop grabbing anymore after. 
+            if (starting_point == -1 && ((*array)->array[i] > 32 && (*array)->array[i] < 127))
+                starting_point = i;
+            if ((*array)->array[i] > 32 && (*array)->array[i] < 127)
+                ending_point = i;
+        }
+        
+        // I tried the case of just using strncpy to move the content of the string to the beginning of the string but
+        // - this causes an issue in valgrind / low level memory. The error is: __strcpy_sse2_unaligned
+        char * temp = calloc(((*array)->current_num_col - starting_point) + 1, sizeof(char));
+        strncpy(temp, &(*array)->array[starting_point], (*array)->current_num_col - starting_point);
+        sclear(array);
+        sadd(array, "string", temp);
+        free(temp);
 
-    ending_point -= starting_point;
-    (*array)->current_num_col -= starting_point;                       
-    (*array)->array[ending_point + 1] = '\0';
-    // Have to add a one to the ending point since it is zero based, and have to convert it to one base.
-    (*array)->current_num_col -= ((*array)->current_num_col - (ending_point + 1));
+        ending_point -= starting_point;
+        (*array)->current_num_col -= starting_point;                       
+        (*array)->array[ending_point + 1] = '\0';
+        // Have to add a one to the ending point since it is zero based, and have to convert it to one base.
+        (*array)->current_num_col -= ((*array)->current_num_col - (ending_point + 1));
+    } else {
+        if (string_debugger_flag) printf("WARNING: You sent in a NULL pointer...\n");
+    }
 
 	if (string_debugger_flag) printf("Leaving the sremove_leading_and_trailing_spaces funtion.\n");
 
@@ -422,24 +447,28 @@ void sremove(string ** array, char * remove_characters) {
 
 	if (string_debugger_flag) printf("Entering the sremove function.\n");
 
-    int temp_iterator = 0, add_flag = 0, number_of_characters = strlen(remove_characters);
-    char * ptr = calloc(((*array)->total_num_cols + 1), sizeof(char));
-    for (int i = 0; i < (*array)->current_num_col; ++i) {
-        for (int j = 0; j < number_of_characters; ++j) {
-            if ((*array)->array[i] == remove_characters[j])
-                add_flag = 1;
+    if ((*array)) {
+        int temp_iterator = 0, add_flag = 0, number_of_characters = strlen(remove_characters);
+        char * ptr = calloc(((*array)->total_num_cols + 1), sizeof(char));
+        for (int i = 0; i < (*array)->current_num_col; ++i) {
+            for (int j = 0; j < number_of_characters; ++j) {
+                if ((*array)->array[i] == remove_characters[j])
+                    add_flag = 1;
+            }
+            if (add_flag)
+                add_flag = 0;
+            else  {
+                ptr[temp_iterator] = (*array)->array[i];
+                temp_iterator++;
+            }  
         }
-        if (add_flag)
-            add_flag = 0;
-        else  {
-            ptr[temp_iterator] = (*array)->array[i];
-            temp_iterator++;
-        }  
-    }
 
-    sclear(array);
-    sadd(array, "string", ptr);
-    free(ptr);
+        sclear(array);
+        sadd(array, "string", ptr);
+        free(ptr);
+    } else {
+        if (string_debugger_flag) printf("WARNING: You sent in a NULL pointer...\n");
+    }
 
 	if (string_debugger_flag) printf("Leaving the sremove funtion.\n");
 
@@ -458,17 +487,21 @@ void sclear(string ** array) {
     
     if (string_debugger_flag) printf("Entering the sclear function.\n");
 
-    if ((*array)->tokens) {
-        for (int i = 0; i < (*array)->total_num_tokens; ++i)
-            free((*array)->tokens[i]);
-        free((*array)->tokens);
-        (*array)->tokens = NULL;
-        (*array)->total_num_tokens = 0;
-    }
+    if ((*array)) {
+        if ((*array)->tokens) {
+            for (int i = 0; i < (*array)->total_num_tokens; ++i)
+                free((*array)->tokens[i]);
+            free((*array)->tokens);
+            (*array)->tokens = NULL;
+            (*array)->total_num_tokens = 0;
+        }
 
-    memset((*array)->array, 0, (*array)->total_num_cols * sizeof(char));
-    
-    (*array)->current_num_col = 0;
+        memset((*array)->array, 0, (*array)->total_num_cols * sizeof(char));
+        
+        (*array)->current_num_col = 0;
+    } else {
+        if (string_debugger_flag) printf("WARNING: You sent in a NULL pointer...\n");
+    }
 
     if (string_debugger_flag) printf("Leaving the sclear function.\n");
 
@@ -493,31 +526,35 @@ int sreset(string ** array, int number_of_columns, int col_incrementation) {
 
     if (string_debugger_flag) printf("Entering the sreset function.\n");
     
-    if (col_incrementation)
-        (*array)->col_incrementation = col_incrementation;
+    if ((*array)) {
+        if (col_incrementation)
+            (*array)->col_incrementation = col_incrementation;
 
-    if (number_of_columns) {
-        (*array)->array = realloc((*array)->array, number_of_columns * sizeof(char));
-        if (!(*array)->array) {
-            printf("ERROR: There was an issue with reallocating the given pointer.\n");
-            if (string_debugger_flag) printf("Leaving the sclear function.\n");
-            return 1;
+        if (number_of_columns) {
+            (*array)->array = realloc((*array)->array, number_of_columns * sizeof(char));
+            if (!(*array)->array) {
+                printf("ERROR: There was an issue with reallocating the given pointer.\n");
+                if (string_debugger_flag) printf("Leaving the sclear function.\n");
+                return 1;
+            }
+            (*array)->total_num_cols = number_of_columns;
         }
-        (*array)->total_num_cols = number_of_columns;
-    }
-    
-    if ((*array)->tokens) {
-        for (int i = 0; i < (*array)->total_num_tokens; ++i)
-            free((*array)->tokens[i]);
-        free((*array)->tokens);
-        (*array)->tokens = NULL;
-        (*array)->total_num_tokens = 0;
+        
+        if ((*array)->tokens) {
+            for (int i = 0; i < (*array)->total_num_tokens; ++i)
+                free((*array)->tokens[i]);
+            free((*array)->tokens);
+            (*array)->tokens = NULL;
+            (*array)->total_num_tokens = 0;
+        }
+
+        memset((*array)->array, 0, (*array)->total_num_cols * sizeof(char));
+        
+        (*array)->current_num_col = 0;
+    } else {
+        if (string_debugger_flag) printf("WARNING: You sent in a NULL pointer...\n");
     }
 
-    memset((*array)->array, 0, (*array)->total_num_cols * sizeof(char));
-    
-    (*array)->current_num_col = 0;
-    
     if (string_debugger_flag) printf("Leaving the sreset function.\n");
     
     return 0;
@@ -534,14 +571,18 @@ void sfree(string ** array) {
 
 	if (string_debugger_flag) printf("Entering the sfree function.\n");
 
-    if ((*array)->tokens) {
-        for (int i = 0; i < (*array)->total_num_tokens; ++i)
-            free((*array)->tokens[i]);
-        free((*array)->tokens);
-    }
+    if ((*array)) {
+        if ((*array)->tokens) {
+            for (int i = 0; i < (*array)->total_num_tokens; ++i)
+                free((*array)->tokens[i]);
+            free((*array)->tokens);
+        }
 
-    free((*array)->array);
-    free((*array));
+        free((*array)->array);
+        free((*array));
+    } else {
+        if (string_debugger_flag) printf("WARNING: You sent in a NULL pointer...\n");
+    }
 
 	if (string_debugger_flag) printf("Leaving the sfree funtion\n");
 

@@ -16,4 +16,4 @@ archive_debug:
 	ar rcs astring.a astring.o
 
 clean:
-	rm *.o *.a *.out
+	rm -f *.o *.a *.out
