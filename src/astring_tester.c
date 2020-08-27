@@ -65,6 +65,13 @@ int main() {
         return 1;
     }
 
+    sclear(&cstring);
+    sadd(&cstring, "double", 2.000000);
+    if (strcmp(cstring->array, "2")) {
+        printf("Test-%d-8 Failure: The char pointer in the string structure is %s and should be %s.\n", test_id, cstring->array, "2");
+        return 1;
+    } 
+
     // Test-3 (sinsert)
     test_id = 3;
     printf("Testing sinsert...\n");
