@@ -44,9 +44,32 @@ int main() {
         return 1;
     }
 
+    sclear(&cstring);
+    sadd(&cstring, "int", 10);
+    if (strcmp(cstring->array, "10")) {
+        printf("Test-%d-5 Failure: The char pointer in the string structure is %s and should be %s.\n", test_id, cstring->array, "10");
+        return 1;
+    }
+
+    sclear(&cstring);
+    sadd(&cstring, "float", 10.11);
+    if (strcmp(cstring->array, "10.11")) {
+        printf("Test-%d-6 Failure: The char pointer in the string structure is %s and should be %s.\n", test_id, cstring->array, "10.11");
+        return 1;
+    }
+
+    sclear(&cstring);
+    sadd(&cstring, "double", 10.111234);
+    if (strcmp(cstring->array, "10.111234")) {
+        printf("Test-%d-7 Failure: The char pointer in the string structure is %s and should be %s.\n", test_id, cstring->array, "10.111234");
+        return 1;
+    }
+
     // Test-3 (sinsert)
     test_id = 3;
     printf("Testing sinsert...\n");
+    sclear(&cstring);
+    sadd(&cstring, "string", "Aaron Valoroso");
     sinsert(&cstring, 6, "string", "Anthony ");
 
     if (strcmp(cstring->array, "Aaron Anthony Valoroso")) {
@@ -111,6 +134,18 @@ int main() {
 
     if (cstring->current_num_col != strlen("AAAAaron AAnthony Valorosoooo")) {
         printf("Test-%d-12 Failure: The current_num_col in the string structure is %d and should be %d.\n", test_id, cstring->current_num_col, strlen("AAAAaron AAnthony Valorosoooo"));
+        return 1;
+    }
+
+    sinsert(&cstring, strlen("AAAAaron "), "int", 10);
+    if (strcmp(cstring->array, "AAAAaron 10AAnthony Valorosoooo")) {
+        printf("Test-%d-13 Failure: The char pointer in the string structure is %s and should be %s.\n", test_id, cstring->array, "AAAAaron 10AAnthony Valorosoooo");
+        return 1;
+    }
+
+    sinsert(&cstring, strlen("AAAAaron 10AAnthony "), "double", 20.22);
+    if (strcmp(cstring->array, "AAAAaron 10AAnthony 20.22Valorosoooo")) {
+        printf("Test-%d-14 Failure: The char pointer in the string structure is %s and should be %s.\n", test_id, cstring->array, "AAAAaron 10AAnthony 20.22Valorosoooo");
         return 1;
     }
 

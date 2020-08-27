@@ -11,6 +11,26 @@
 
 int string_debugger_flag = 0;
 
+int get_number_of_decimal_values(char * incoming_number) {
+
+    // Determine when a decimal is found in the given number.
+    int decimal_flag = 0;
+    // Keep track of how many numbers (1-9) are after the decimal.
+    int number_of_decimal_values = 0;
+    // Loop through the given number.
+    for (int i = 0; i < strlen(incoming_number); ++i) {
+        // Search for the decimal number.
+        if (incoming_number[i] == 46)
+            decimal_flag = i;
+        // If the decimal is found find the last digit between (1-9)
+        if (decimal_flag) {
+            if (incoming_number[i] >= 49 && incoming_number[i] <= 57)
+                number_of_decimal_values = i;
+        }
+    }
+    // If the number of decimal values is that are not zero is negative then set the flag to zero, or to the precise number of decimal values.
+    return number_of_decimal_values - decimal_flag;
+}
 //-----------------------------------------------------------------------------------------------------
 /**
  * This function will take in a string structure that will realloc the char pointer that is holding the 
@@ -130,6 +150,28 @@ int sadd(string ** array, const char * format, ...) {
             char * string2 = calloc(strlen(string) + 1, sizeof(char));
             strncpy(string2, string, strlen(string));
             vptr = string2;
+        } else if (!strcmp(format, "int")) {
+            char  * temp_number = calloc(100, sizeof(char));
+            sprintf(temp_number, "%d", va_arg(arguments, int));
+            char * actual_number = calloc(strlen(temp_number) + 1, sizeof(char));
+            strcpy(actual_number, temp_number);
+            free(temp_number);
+            vptr = actual_number;
+        } else if (!strcmp(format, "float") || !strcmp(format, "double")) {
+            // Create a temp char pointer for guessing at how big the number is.
+            char  * temp_number = calloc(1000, sizeof(char));
+            // Save the incoming number as a double.
+            double incoming_number = va_arg(arguments, double);
+            // Copy the number into a char pointer to figure out the number of decimal positions
+            sprintf(temp_number, "%f", incoming_number);
+            // Get the number of digits > 0 after the decimal.
+            int number_of_decimals = get_number_of_decimal_values(temp_number);
+            // Get the base number of digits and decimal into a char array.
+            char * actual_number = calloc(strlen(temp_number) + 1, sizeof(char));
+            // Copy the number into the previous char array with no tailing zeros.
+            sprintf(actual_number, "%.*f", number_of_decimals, incoming_number);
+            free(temp_number);
+            vptr = actual_number;
         } else {
             printf("ERROR: The given data type is not supported...\n");
             if (string_debugger_flag) printf("Leaving the sadd funtion.\n");
@@ -199,6 +241,28 @@ int sinsert(string ** array, int position, const char * format, ...) {
             char * string2 = calloc(strlen(string) + 1, sizeof(char));
             strncpy(string2, string, strlen(string));
             vptr = string2;
+        } else if (!strcmp(format, "int")) {
+            char  * temp_number = calloc(100, sizeof(char));
+            sprintf(temp_number, "%d", va_arg(arguments, int));
+            char * actual_number = calloc(strlen(temp_number) + 1, sizeof(char));
+            strcpy(actual_number, temp_number);
+            free(temp_number);
+            vptr = actual_number;
+        } else if (!strcmp(format, "float") || !strcmp(format, "double")) {
+            // Create a temp char pointer for guessing at how big the number is.
+            char  * temp_number = calloc(1000, sizeof(char));
+            // Save the incoming number as a double.
+            double incoming_number = va_arg(arguments, double);
+            // Copy the number into a char pointer to figure out the number of decimal positions
+            sprintf(temp_number, "%f", incoming_number);
+            // Get the number of digits > 0 after the decimal.
+            int number_of_decimals = get_number_of_decimal_values(temp_number);
+            // Get the base number of digits and decimal into a char array.
+            char * actual_number = calloc(strlen(temp_number) + 1, sizeof(char));
+            // Copy the number into the previous char array with no tailing zeros.
+            sprintf(actual_number, "%.*f", number_of_decimals, incoming_number);
+            free(temp_number);
+            vptr = actual_number;
         } else {
             printf("ERROR: The given data type is not supported...\n");
             if (string_debugger_flag) printf("Leaving the sadd funtion.\n");
