@@ -11,6 +11,15 @@
 
 int string_debugger_flag = 0;
 
+//-----------------------------------------------------------------------------------------------------
+/**
+ * This function will take in a char pointer that will contain a decimal number of various kinds. The
+ * goal of this function is to figure out how many digits that are greater than zero after the decimal
+ * symbol. 
+ *
+ * \param[in] incoming_number: is a char pointer containing a decimal number.
+ * \param[out] return: will be an integer value of the number of digits greater than zero after the decimal symbol.
+ */
 int get_number_of_decimal_values(char * incoming_number) {
 
     // Determine when a decimal is found in the given number.
@@ -31,6 +40,7 @@ int get_number_of_decimal_values(char * incoming_number) {
     // If the number of decimal values is that are not zero is negative then set the flag to zero, or to the precise number of decimal values.
     return number_of_decimal_values - decimal_flag;
 }
+
 //-----------------------------------------------------------------------------------------------------
 /**
  * This function will take in a string structure that will realloc the char pointer that is holding the 
