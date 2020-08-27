@@ -38,7 +38,7 @@ int get_number_of_decimal_values(char * incoming_number) {
         }
     }
     // If the number of decimal values is that are not zero is negative then set the flag to zero, or to the precise number of decimal values.
-    return number_of_decimal_values - decimal_flag;
+    return (number_of_decimal_values - decimal_flag) > 0 ? (number_of_decimal_values - decimal_flag) : 0;
 }
 
 //-----------------------------------------------------------------------------------------------------
