@@ -430,38 +430,115 @@ int stokenize(string ** array, char token_char) {
 
 //-----------------------------------------------------------------------------------------------------
 /**
- * This function will take the string structure and do one of two things with the char pointer within 
- * the structure. If the position is given then the function will stick a NULL terminator in the char
- * pointer of the string structure. If the character is given then the function will loop through 
- * the char pointer in the string structure for the first occurence of said character and stick a NULL
- * terminator there.
+ * This function will take in a string structure and remove all characters that were passed into this function
+ * from the char pointer in the structure. The function will create a temporary pointer with the same amount of
+ * memory and loop through all of the characters in the char pointer of the string structure. Each characters is
+ * checked against the remove characters pointer. All characters that do not consist of any characters from the 
+ * remove characters pointer are added to the temporary pointer. Once finished, the system will clear the string
+ * structure, and add the temporary pointer to the string structure.
  *
  * \param[in] array: is a string structure.
- * \param[in] position: is an integer that tells the function where a null terminator needs to be added.
- * \param[in] character: is a char character that tells the function on where a null terminator needs to be added.
- * \param[out] return (on success): will be an integer value of zero.
- * \param[out] return (on failure): will be an integer value of one.
+ * \param[in] remove_characters: is a char pointer that holds characters to be removed from said string.
  */
-void strunc(string ** array, int position, char character) {
+void schar_delete(string ** array, char * remove_characters) {
+
+	if (string_debugger_flag) printf("Entering the sremove function.\n");
+
+    if ((*array)) {
+        int temp_iterator = 0, add_flag = 0, number_of_characters = strlen(remove_characters);
+        char * ptr = calloc(((*array)->total_num_cols + 1), sizeof(char));
+        for (int i = 0; i < (*array)->current_num_col; ++i) {
+            for (int j = 0; j < number_of_characters; ++j) {
+                if ((*array)->array[i] == remove_characters[j])
+                    add_flag = 1;
+            }
+            if (add_flag)
+                add_flag = 0;
+            else  {
+                ptr[temp_iterator] = (*array)->array[i];
+                temp_iterator++;
+            }  
+        }
+
+        sclear(array);
+        sadd(array, "string", ptr);
+        free(ptr);
+    } else {
+        if (string_debugger_flag) printf("WARNING: You sent in a NULL pointer...\n");
+    }
+
+	if (string_debugger_flag) printf("Leaving the sremove funtion.\n");
+
+    return;
+}
+
+//-----------------------------------------------------------------------------------------------------
+/**
+ * This function will take the string structure and either remove a group of characters or a single character
+ * from the char pointer in the string structure. The function first checks to make sure that the user is not
+ * doing anything silly by giving false starting and ending positions, and then to see if they are just trying
+ * to clear the entire char pointer in the string structure. Next, if they are not doing anything silly, I check
+ * to see where the user is trying to remove characters from the char pointer and update a new temporary char 
+ * pointer with the data that they want to keep. Once, finished, I reset the char pointer and the number of 
+ * characters in the string structure to the update data. Lastly, the starting and ending position are zero
+ * based.
+ *
+ * \param[in] array: is a string structure.
+ * \param[in] starting_position: is an integer that tells the function the starting position for removing characters is.
+ * \param[in] ending_position: is an integer that tells the function the ending position to stop removing characters.
+ * \param[out] return (on success): will be a string structure with an update char pointer.
+ * \param[out] return (on failure): will be keep all the original data that was sent in.
+ */
+void schar_groupd_delete(string ** array, int starting_position, int ending_position) {
 
 	if (string_debugger_flag) printf("Entering the strunc function.\n");
 
     if ((*array)) {
-        // If the position_or_char is bigger than the length of the string.
-        if (character) {
-            // Look of the first occurence of a letter and put a null terminator there.
-            for (int i = 0; i < (*array)->current_num_col; ++i) {
-                if ((*array)->array[i] == character) {
-                    (*array)->array[i] = '\0';
-                    (*array)->current_num_col = i;
-                    break;
-                }
-            }
-        } else {
-            // Put a null terminator at a specific place in the string. 
-            (*array)->array[position] = '\0';
-            (*array)->current_num_col = position;
+        if (starting_position > (*array)->current_num_col || starting_position < 0) {
+            // Check to make sure that the starting position is some where within the length of the string structure array.
+            if (starting_position > (*array)->current_num_col) 
+                if (string_debugger_flag) printf("WARNING: Your starting position is greater than the current length of the string.\n");
+            if (starting_position < 0)
+                if (string_debugger_flag) printf("WARNING: Your starting position is less than zero.\n");
+            return;
         }
+
+        if (ending_position > (*array)->current_num_col || ending_position < 0) {
+            // Check to make sure that the ending position is some where within the length of the string structure array.
+            if (ending_position > (*array)->current_num_col) 
+                if (string_debugger_flag) printf("WARNING: Your ending position is greater than the current length of the string.\n");
+            if (ending_position < 0)
+                if (string_debugger_flag) printf("WARNING: Your ending position is less than zero.\n");
+            return;
+        }
+
+        if ((ending_position - starting_position) == (*array)->current_num_col) {
+            // Check to see if the user is trying to delete the whole array.
+            sclear(array);
+            return;
+        }
+
+        char * temp = calloc((*array)->current_num_col + 1, sizeof(char));
+        if (!starting_position) {
+            // Deleting something from the start of the string to the middle.
+            strncpy(temp, &(*array)->array[ending_position], ((*array)->current_num_col - ending_position) * sizeof(char));
+        } else if (ending_position == (*array)->current_num_col) {
+            // Deleting something from the middle of the string to the very end.
+            strncpy(temp, (*array)->array, starting_position * sizeof(char));
+        } else {
+            // Deleting something from the middle of the string to the middle.
+            strncpy(temp, (*array)->array, starting_position * sizeof(char));
+            strncat(temp, &(*array)->array[ending_position], ((*array)->current_num_col - ending_position) * sizeof(char));
+        }
+        
+        // Reset the original char pointer in the string structure.
+        memset((*array)->array, 0, (*array)->current_num_col * sizeof(char));
+        // Copy the new data into the original char pointer.
+        strcpy((*array)->array, temp);
+        // Update the number of current characters in the string.
+        (*array)->current_num_col -= (ending_position - starting_position);
+        // Cleanup
+        free(temp);
     } else {
         if (string_debugger_flag) printf("WARNING: You sent in a NULL pointer...\n");
     }
@@ -513,50 +590,6 @@ void sremove_leading_and_trailing_spaces(string ** array) {
     }
 
 	if (string_debugger_flag) printf("Leaving the sremove_leading_and_trailing_spaces funtion.\n");
-
-    return;
-}
-
-//-----------------------------------------------------------------------------------------------------
-/**
- * This function will take in a string structure and remove all characters that were passed into this function
- * from the char pointer in the structure. The function will create a temporary pointer with the same amount of
- * memory and loop through all of the characters in the char pointer of the string structure. Each characters is
- * checked against the remove characters pointer. All characters that do not consist of any characters from the 
- * remove characters pointer are added to the temporary pointer. Once finished, the system will clear the string
- * structure, and add the temporary pointer to the string structure.
- *
- * \param[in] array: is a string structure.
- * \param[in] remove_characters: is a char pointer that holds characters to be removed from said string.
- */
-void sremove(string ** array, char * remove_characters) {
-
-	if (string_debugger_flag) printf("Entering the sremove function.\n");
-
-    if ((*array)) {
-        int temp_iterator = 0, add_flag = 0, number_of_characters = strlen(remove_characters);
-        char * ptr = calloc(((*array)->total_num_cols + 1), sizeof(char));
-        for (int i = 0; i < (*array)->current_num_col; ++i) {
-            for (int j = 0; j < number_of_characters; ++j) {
-                if ((*array)->array[i] == remove_characters[j])
-                    add_flag = 1;
-            }
-            if (add_flag)
-                add_flag = 0;
-            else  {
-                ptr[temp_iterator] = (*array)->array[i];
-                temp_iterator++;
-            }  
-        }
-
-        sclear(array);
-        sadd(array, "string", ptr);
-        free(ptr);
-    } else {
-        if (string_debugger_flag) printf("WARNING: You sent in a NULL pointer...\n");
-    }
-
-	if (string_debugger_flag) printf("Leaving the sremove funtion.\n");
 
     return;
 }
