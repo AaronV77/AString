@@ -223,7 +223,7 @@ int main() {
 
     new_function(&cstring, 3, 6);
     if (strcmp(cstring->array, "aroaloroso")) {
-        printf("Test-%d-3 Failure: The char pointer in the string structure is %s and should be %s.\n", test_id, cstring->array, "aroaloroso");
+        printf("Test-%d-2 Failure: The char pointer in the string structure is %s and should be %s.\n", test_id, cstring->array, "aroaloroso");
         return 1;
     }
 
@@ -234,7 +234,13 @@ int main() {
     }
 
     if (cstring->current_num_col != strlen("aroalo")) {
-        printf("Test-%d-2 Failure: The current_num_col in the string structure is %d and should be %d.\n", test_id, cstring->current_num_col, strlen("aroalo"));
+        printf("Test-%d-4 Failure: The current_num_col in the string structure is %d and should be %d.\n", test_id, cstring->current_num_col, strlen("aroalo"));
+        return 1;
+    }
+
+    new_function(&cstring, 0, strlen("aroalo"));
+    if (strlen(cstring->array)) {
+        printf("Test-%d-5 Failure: The char pointer in the string structure is %s and should empty.\n", test_id, cstring->array);
         return 1;
     }
 

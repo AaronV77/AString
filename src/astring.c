@@ -430,17 +430,20 @@ int stokenize(string ** array, char token_char) {
 
 //-----------------------------------------------------------------------------------------------------
 /**
- * This function will take the string structure and do one of two things with the char pointer within 
- * the structure. If the position is given then the function will stick a NULL terminator in the char
- * pointer of the string structure. If the character is given then the function will loop through 
- * the char pointer in the string structure for the first occurence of said character and stick a NULL
- * terminator there.
+ * This function will take the string structure and either remove a group of characters or a single character
+ * from the char pointer in the string structure. The function first checks to make sure that the user is not
+ * doing anything silly by giving false starting and ending positions, and then to see if they are just trying
+ * to clear the entire char pointer in the string structure. Next, if they are not doing anything silly, I check
+ * to see where the user is trying to remove characters from the char pointer and update a new temporary char 
+ * pointer with the data that they want to keep. Once, finished, I reset the char pointer and the number of 
+ * characters in the string structure to the update data. Lastly, the starting and ending position are zero
+ * based.
  *
  * \param[in] array: is a string structure.
- * \param[in] position: is an integer that tells the function where a null terminator needs to be added.
- * \param[in] character: is a char character that tells the function on where a null terminator needs to be added.
- * \param[out] return (on success): will be an integer value of zero.
- * \param[out] return (on failure): will be an integer value of one.
+ * \param[in] starting_position: is an integer that tells the function the starting position for removing characters is.
+ * \param[in] ending_position: is an integer that tells the function the ending position to stop removing characters.
+ * \param[out] return (on success): will be a string structure with an update char pointer.
+ * \param[out] return (on failure): will be keep all the original data that was sent in.
  */
 void new_function(string ** array, int starting_position, int ending_position) {
 
@@ -448,6 +451,7 @@ void new_function(string ** array, int starting_position, int ending_position) {
 
     if ((*array)) {
         if (starting_position > (*array)->current_num_col || starting_position < 0) {
+            // Check to make sure that the starting position is some where within the length of the string structure array.
             if (starting_position > (*array)->current_num_col) 
                 if (string_debugger_flag) printf("WARNING: Your starting position is greater than the current length of the string.\n");
             if (starting_position < 0)
@@ -456,6 +460,7 @@ void new_function(string ** array, int starting_position, int ending_position) {
         }
 
         if (ending_position > (*array)->current_num_col || ending_position < 0) {
+            // Check to make sure that the ending position is some where within the length of the string structure array.
             if (ending_position > (*array)->current_num_col) 
                 if (string_debugger_flag) printf("WARNING: Your ending position is greater than the current length of the string.\n");
             if (ending_position < 0)
@@ -482,9 +487,13 @@ void new_function(string ** array, int starting_position, int ending_position) {
             strncat(temp, &(*array)->array[ending_position], ((*array)->current_num_col - ending_position) * sizeof(char));
         }
         
+        // Reset the original char pointer in the string structure.
         memset((*array)->array, 0, (*array)->current_num_col * sizeof(char));
+        // Copy the new data into the original char pointer.
         strcpy((*array)->array, temp);
+        // Update the number of current characters in the string.
         (*array)->current_num_col -= (ending_position - starting_position);
+        // Cleanup
         free(temp);
     } else {
         if (string_debugger_flag) printf("WARNING: You sent in a NULL pointer...\n");
