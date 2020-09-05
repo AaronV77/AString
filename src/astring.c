@@ -124,16 +124,16 @@ string * salloc(int number_of_columns, int col_incrementation) {
 
 //-----------------------------------------------------------------------------------------------------
 /**
- * This function will take a string structure char pointer and add either a char or a char pointer to
- * the data within the structure. A void pointer is used due to the unknown type of data, and only
- * a char or char pointer is accepted. The current length of the char pointer, the incoming length of
- * the data and null terminator is checked against the amount of memory that is allocated for the char
- * pointer in the string structure. If there is no room for the incoming data then the function will
- * Take the combination of lenghts and add the col_incrementation to it, and resize the char pointer in
- * the string structure. I've debated on keeping the col_incremntation and left it in to allow the user
- * to control how well this library runs. If the user gives a small to zero number, then the library will
- * constantly have to keep allocating for more memory to the pointer, else if they give a big number
- * then less allocates will have to be made (saving some time).
+ * This function will take a string structure and incoming data to be appened the the char pointer
+ * within the string structure. A void pointer is used due to the unknown type of data, and only
+ * a char, int, float, double, and char pointer are accepted. The current length of the char pointer, the 
+ * incoming length of the data and null terminator is checked against the amount of memory that is 
+ * allocated for the char pointer in the string structure. If there is no room for the incoming data 
+ * then the function will Take the combination of lenghts and add the col_incrementation to it, and 
+ * resize the char pointer in the string structure. I've debated on keeping the col_incremntation and 
+ * left it in to allow the user to control how well this library runs. If the user gives a small to 
+ * zero number, then the library will constantly have to keep allocating for more memory to the pointer, 
+ * else if they give a big number then less allocates will have to be made (saving some time).
  *
  * \param[in] array: is a string structure.
  * \param[in] format: is a const char pointer that stores the datatype for the incoming data.
@@ -192,12 +192,15 @@ int sadd(string ** array, const char * format, ...) {
         // At this point vptr should all be a char pointer
         int temp_length = (*array)->current_num_col + strlen((char*)vptr) + 1;
         if ((*array)->total_num_cols < temp_length) {
+            // Check to see if the added data to the string structure exceeds the current memory buffer.
+            // Take the current length and add extra memory for furture adds.
             (*array)->total_num_cols = temp_length + (*array)->col_incrementation;
+            // Realloc the char pointer within the string structure for the new lenght.
             column_reallocation(array, (*array)->total_num_cols);
         }
         // Need to subtract one from the temp length due to its addition of the null terminator.
         (*array)->current_num_col = (temp_length - 1);
-        
+        // Add the incoming data to the char pointer within the string structure.
         strcat((*array)->array, (char*)vptr);
 
         va_end(arguments);
@@ -213,17 +216,17 @@ int sadd(string ** array, const char * format, ...) {
 
 //-----------------------------------------------------------------------------------------------------
 /**
- * This function will take a string structure char pointer and insert either a char or a char pointer to
- * the data within the structure. This function was created because of the sadd function not being able to
- * add characters in the beginning of the string.A void pointer is used due to the unknown type of data, 
- * and only a char or char pointer is accepted. The current length of the char pointer, the incoming length 
- * of the data and null terminator is checked against the amount of memory that is allocated for the char
- * pointer in the string structure. If there is no room for the incoming data then the function will
- * Take the combination of lenghts and add the col_incrementation to it, and resize the char pointer in
- * the string structure. I've debated on keeping the col_incremntation and left it in to allow the user
- * to control how well this library runs. If the user gives a small to zero number, then the library will
- * constantly have to keep allocating for more memory to the pointer, else if they give a big number
- * then less allocates will have to be made (saving some time).
+ * This function will take a string structure char pointer and insert either a char, int, double, float,
+ *  or a char pointer to the char pointer within the string structure. This function was created because 
+ * of the sadd function not being able to add characters in the beginning of the string. A void pointer 
+ * is used due to the unknown type of data, and only a char or char pointer is accepted. The current length 
+ * of the char pointer, the incoming length of the data and null terminator is checked against the amount 
+ * of memory that is allocated for the char pointer in the string structure. If there is no room for the 
+ * incoming data then the function will Take the combination of lenghts and add the col_incrementation to 
+ * it, and resize the char pointer in the string structure. I've debated on keeping the col_incremntation 
+ * and left it in to allow the user to control how well this library runs. If the user gives a small to zero
+ * number, then the library will constantly have to keep allocating for more memory to the pointer, else if 
+ * they give a big number then less allocates will have to be made (saving some time).
  *
  * \param[in] array: is a string structure.
  * \param[in] position: is an integer that tells the function where to insert the incoming data.
@@ -283,22 +286,31 @@ int sinsert(string ** array, int position, const char * format, ...) {
         // At this point vptr should all be a char pointer
         int temp_length = (*array)->current_num_col + strlen((char*)vptr) + 1;
         if ((*array)->total_num_cols < temp_length) {
+            // Check to see if the added data to the string structure exceeds the current memory buffer.
+            // Take the current length and add extra memory for furture adds.
             (*array)->total_num_cols = temp_length + (*array)->col_incrementation;
+            // Realloc the char pointer within the string structure for the new lenght.
             column_reallocation(array, (*array)->total_num_cols);
         }
         // Need to subtract one from the temp length due to its addition of the null terminator.
         (*array)->current_num_col = (temp_length - 1);
 
+        // Create a new char pointer to for holding all of the data.
         char * temp = calloc((*array)->current_num_col + 1, sizeof(char));
+        // Copy everything up to the point of the position to the new char pointer.
         strncpy(temp, (*array)->array, position * sizeof(char));
+        // Add the data that was sent in by the user, again should be a char pointer.
         strcat(temp, (char*)vptr);
+        // Copy the rest of the original data from the string structure and add it to the new char pointer.
         strncat(temp, &(*array)->array[position], ((*array)->current_num_col - (position + strlen((char*)vptr))) * sizeof(char));
+        // Clear out the original pointer in the string structure.
         memset((*array)->array, 0, (*array)->current_num_col * sizeof(char));
+        // Copy the temporary char pointer that is holding all of the data back into the string structure.
         strcpy((*array)->array, temp);
 
         free(temp);
-        va_end(arguments);
         free(vptr);
+        va_end(arguments);
     } else {
         if (string_debugger_flag) printf("WARNING: You sent in a NULL pointer...\n");
     }
@@ -404,7 +416,7 @@ int stokenize(string ** array, char token_char) {
             }
             free(token);
         } else {
-            printf("ERROR: There were no characters found like that in the following string: %s\n", (*array)->array);
+            if (string_debugger_flag) printf("WARNING: There were no characters found like that in the following string: %s\n", (*array)->array);
             return 1;
         }
     } else {
