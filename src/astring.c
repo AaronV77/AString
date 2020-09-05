@@ -442,26 +442,50 @@ int stokenize(string ** array, char token_char) {
  * \param[out] return (on success): will be an integer value of zero.
  * \param[out] return (on failure): will be an integer value of one.
  */
-void strunc(string ** array, int position, char character) {
+void new_function(string ** array, int starting_position, int ending_position) {
 
 	if (string_debugger_flag) printf("Entering the strunc function.\n");
 
     if ((*array)) {
-        // If the position_or_char is bigger than the length of the string.
-        if (character) {
-            // Look of the first occurence of a letter and put a null terminator there.
-            for (int i = 0; i < (*array)->current_num_col; ++i) {
-                if ((*array)->array[i] == character) {
-                    (*array)->array[i] = '\0';
-                    (*array)->current_num_col = i;
-                    break;
-                }
-            }
-        } else {
-            // Put a null terminator at a specific place in the string. 
-            (*array)->array[position] = '\0';
-            (*array)->current_num_col = position;
+        if (starting_position > (*array)->current_num_col || starting_position < 0) {
+            if (starting_position > (*array)->current_num_col) 
+                if (string_debugger_flag) printf("WARNING: Your starting position is greater than the current length of the string.\n");
+            if (starting_position < 0)
+                if (string_debugger_flag) printf("WARNING: Your starting position is less than zero.\n");
+            return;
         }
+
+        if (ending_position > (*array)->current_num_col || ending_position < 0) {
+            if (ending_position > (*array)->current_num_col) 
+                if (string_debugger_flag) printf("WARNING: Your ending position is greater than the current length of the string.\n");
+            if (ending_position < 0)
+                if (string_debugger_flag) printf("WARNING: Your ending position is less than zero.\n");
+            return;
+        }
+
+        if ((ending_position - starting_position) == (*array)->current_num_col) {
+            // Check to see if the user is trying to delete the whole array.
+            sclear(array);
+            return;
+        }
+
+        char * temp = calloc((*array)->current_num_col + 1, sizeof(char));
+        if (!starting_position) {
+            // Deleting something from the start of the string to the middle.
+            strncpy(temp, &(*array)->array[ending_position], ((*array)->current_num_col - ending_position) * sizeof(char));
+        } else if (ending_position == (*array)->current_num_col) {
+            // Deleting something from the middle of the string to the very end.
+            strncpy(temp, (*array)->array, starting_position * sizeof(char));
+        } else {
+            // Deleting something from the middle of the string to the middle.
+            strncpy(temp, (*array)->array, starting_position * sizeof(char));
+            strncat(temp, &(*array)->array[ending_position], ((*array)->current_num_col - ending_position) * sizeof(char));
+        }
+        
+        memset((*array)->array, 0, (*array)->current_num_col * sizeof(char));
+        strcpy((*array)->array, temp);
+        (*array)->current_num_col -= (ending_position - starting_position);
+        free(temp);
     } else {
         if (string_debugger_flag) printf("WARNING: You sent in a NULL pointer...\n");
     }

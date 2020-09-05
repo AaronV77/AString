@@ -205,31 +205,41 @@ int main() {
         return 1;
     }
 
-    // Test-6 (strunc)
+    // Test-6 (new function)
     test_id = 6;
-    printf("Testing strunc...\n");
-    strunc(&cstring, 0, ' ');
+    printf("Testing new function...\n");
+    new_function(&cstring, 0, 1);
 
-    if (strcmp(cstring->array, "Aaron")) {
-        printf("Test-%d-1 Failure: The char pointer in the string structure is %s and should be %s.\n", test_id, cstring->array, "Aaron");
+    // Remove something from the beginning
+    // Remove something from the middle
+    // Remove something from the end
+
+    // Check the current number of items in the arary. 
+
+    if (strcmp(cstring->array, "aron Valoroso")) {
+        printf("Test-%d-1 Failure: The char pointer in the string structure is %s and should be %s.\n", test_id, cstring->array, "aron Valoroso");
         return 1;
     }
 
-    if (cstring->current_num_col != 5) {
-        printf("Test-%d-2 Failure: The current_num_col in the string structure is %d and should be %d.\n", test_id, cstring->current_num_col, 5);
+    new_function(&cstring, 3, 6);
+    if (strcmp(cstring->array, "aroaloroso")) {
+        printf("Test-%d-3 Failure: The char pointer in the string structure is %s and should be %s.\n", test_id, cstring->array, "aroaloroso");
         return 1;
     }
 
-    strunc(&cstring, 3, 0);
-    if (strcmp(cstring->array, "Aar")) {
-        printf("Test-%d-3 Failure: The char pointer in the string structure is %s and should be %s.\n", test_id, cstring->array, "Aar");
+    new_function(&cstring, 6, strlen("aroaloroso"));
+    if (strcmp(cstring->array, "aroalo")) {
+        printf("Test-%d-3 Failure: The char pointer in the string structure is %s and should be %s.\n", test_id, cstring->array, "aroalo");
         return 1;
     }
 
-    if (cstring->current_num_col != 3) {
-        printf("Test-%d-2 Failure: The current_num_col in the string structure is %d and should be %d.\n", test_id, cstring->current_num_col, 3);
+    if (cstring->current_num_col != strlen("aroalo")) {
+        printf("Test-%d-2 Failure: The current_num_col in the string structure is %d and should be %d.\n", test_id, cstring->current_num_col, strlen("aroalo"));
         return 1;
     }
+
+    sclear(&cstring);
+    sadd(&cstring, "string", "Aar");
 
     // Test-7 (sremove)
     test_id = 7;
