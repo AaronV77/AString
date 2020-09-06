@@ -70,7 +70,14 @@ int main() {
     if (strcmp(cstring->array, "2")) {
         printf("Test-%d-8 Failure: The char pointer in the string structure is %s and should be %s.\n", test_id, cstring->array, "2");
         return 1;
-    } 
+    }
+
+    sclear(&cstring);
+    sadd(&cstring, "charstringintdoublefloat", 'A', "Valoroso", 26, 6.4, 230.5);
+    if (strcmp(cstring->array, "AValoroso266.4230.5")) {
+        printf("Test-%d-9 Failure: The char pointer in the string structure is %s and should be %s.\n", test_id, cstring->array, "AValoroso266.4230.5");
+        return 1;
+    }
 
     // Test-3 (sinsert)
     test_id = 3;
