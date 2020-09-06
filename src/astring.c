@@ -125,18 +125,23 @@ string * salloc(int number_of_columns, int col_incrementation) {
 //-----------------------------------------------------------------------------------------------------
 /**
  * This function will take a string structure and incoming data to be appened the the char pointer
- * within the string structure. A void pointer is used due to the unknown type of data, and only
- * a char, int, float, double, and char pointer are accepted. The current length of the char pointer, the 
- * incoming length of the data and null terminator is checked against the amount of memory that is 
- * allocated for the char pointer in the string structure. If there is no room for the incoming data 
- * then the function will Take the combination of lenghts and add the col_incrementation to it, and 
- * resize the char pointer in the string structure. I've debated on keeping the col_incremntation and 
- * left it in to allow the user to control how well this library runs. If the user gives a small to 
- * zero number, then the library will constantly have to keep allocating for more memory to the pointer, 
- * else if they give a big number then less allocates will have to be made (saving some time).
+ * within the string structure. The format for this function can be a mixture of datatypes (char, 
+ * string, int, double, float). To have more than one item be appended to the char pointer within 
+ * the string structure is by concatenating multiple datatype names together. It has to be all lower
+ * case and no characters between each datatype name ("stringcharintdouble"). This is done to make 
+ * the function work easier and not have to try and decifer what the user is sending in. A void 
+ * pointer is used due to the unknown type of data, and only a char, int, float, double, and char 
+ * pointer are accepted. The current length of the char pointer, the incoming length of the data 
+ * and null terminator is checked against the amount of memory that is allocated for the char pointer 
+ * in the string structure. If there is no room for the incoming data then the function will Take the 
+ * combination of lenghts and add the col_incrementation to it, and resize the char pointer in the 
+ * string structure. I've debated on keeping the col_incremntation and left it in to allow the user 
+ * to control how well this library runs. If the user gives a small to zero number, then the library 
+ * will constantly have to keep allocating for more memory to the pointer, else if they give a big 
+ * number then less allocates will have to be made (saving some time).
  *
  * \param[in] array: is a string structure.
- * \param[in] format: is a const char pointer that stores the datatype for the incoming data.
+ * \param[in] format: is a const char pointer that stores the datatype(s) names for the incoming data.
  * \param[in] ...: is either a char or a char pointer of data, nothing else is accpeted.
  * \param[out] return (on success): will be an integer value of zero.
  * \param[out] return (on failure): will be an integer value of one.
@@ -149,64 +154,84 @@ int sadd(string ** array, const char * format, ...) {
         void * vptr;
         va_list arguments;
         va_start(arguments, format);
+        
+        string * format_holder = salloc(strlen(format) + 1, 10);
+        strcpy(format_holder->array, format);
+        format_holder->current_num_col = strlen(format);
 
-        // Grab the characters that are to be added to the end of a string.
-        if (!strcmp(format, "char")) {
-            char * var = calloc(2, sizeof(char));
-            var[0] = va_arg(arguments, int);
-            vptr = var;
-        } else if (!strcmp(format, "string")) {
-            char * string = va_arg(arguments, char*);
-            char * string2 = calloc(strlen(string) + 1, sizeof(char));
-            strncpy(string2, string, strlen(string));
-            vptr = string2;
-        } else if (!strcmp(format, "int")) {
-            char  * temp_number = calloc(100, sizeof(char));
-            sprintf(temp_number, "%d", va_arg(arguments, int));
-            char * actual_number = calloc(strlen(temp_number) + 1, sizeof(char));
-            strcpy(actual_number, temp_number);
-            free(temp_number);
-            vptr = actual_number;
-        } else if (!strcmp(format, "float") || !strcmp(format, "double")) {
-            // Create a temp char pointer for guessing at how big the number is.
-            char  * temp_number = calloc(1000, sizeof(char));
-            // Save the incoming number as a double.
-            double incoming_number = va_arg(arguments, double);
-            // Copy the number into a char pointer to figure out the number of decimal positions
-            sprintf(temp_number, "%f", incoming_number);
-            // Get the number of digits > 0 after the decimal.
-            int number_of_decimals = get_number_of_decimal_values(temp_number);
-            // Get the base number of digits and decimal into a char array.
-            char * actual_number = calloc(strlen(temp_number) + 1, sizeof(char));
-            // Copy the number into the previous char array with no tailing zeros.
-            sprintf(actual_number, "%.*f", number_of_decimals, incoming_number);
-            free(temp_number);
-            vptr = actual_number;
-        } else {
-            printf("ERROR: The given data type is not supported...\n");
-            if (string_debugger_flag) printf("Leaving the sadd funtion.\n");
-            va_end(arguments);
-            return 1;
+        while (1) {
+            void * vptr;
+            if (!format_holder->current_num_col)
+                break;
+
+            if (format_holder->array[0] == 'c') {
+                schar_group_delete(&format_holder, 0, 4);
+                char * var = calloc(2, sizeof(char));
+                var[0] = va_arg(arguments, int);
+                vptr = var;
+            } else if (format_holder->array[0] == 's') {
+                schar_group_delete(&format_holder, 0, 6);
+                char * string = va_arg(arguments, char*);
+                char * string2 = calloc(strlen(string) + 1, sizeof(char));
+                strncpy(string2, string, strlen(string));
+                vptr = string2;
+            } else if (format_holder->array[0] == 'i') {
+                schar_group_delete(&format_holder, 0, 3);
+                char  * temp_number = calloc(100, sizeof(char));
+                sprintf(temp_number, "%d", va_arg(arguments, int));
+                char * actual_number = calloc(strlen(temp_number) + 1, sizeof(char));
+                strcpy(actual_number, temp_number);
+                free(temp_number);
+                vptr = actual_number;
+            } else if (format_holder->array[0] == 'd' || format_holder->array[0] == 'f') {
+                if (format_holder->array[0] == 'd')
+                    schar_group_delete(&format_holder, 0, 6);
+                else if (format_holder->array[0] == 'f') 
+                    schar_group_delete(&format_holder, 0, 5);
+
+                // Create a temp char pointer for guessing at how big the number is.
+                char  * temp_number = calloc(1000, sizeof(char));
+                // Save the incoming number as a double.
+                double incoming_number = va_arg(arguments, double);
+                // Copy the number into a char pointer to figure out the number of decimal positions
+                sprintf(temp_number, "%f", incoming_number);
+                // Get the number of digits > 0 after the decimal.
+                int number_of_decimals = get_number_of_decimal_values(temp_number);
+                // Get the base number of digits and decimal into a char array.
+                char * actual_number = calloc(strlen(temp_number) + 1, sizeof(char));
+                // Copy the number into the previous char array with no tailing zeros.
+                sprintf(actual_number, "%.*f", number_of_decimals, incoming_number);
+                free(temp_number);
+                vptr = actual_number;
+            } else {
+                printf("ERROR: The given data type is not supported.\n");
+                if (string_debugger_flag) printf("Leaving the sadd funtion.\n");
+                va_end(arguments);
+                return 1;
+            }
+
+            // At this point vptr should all be a char pointer
+            int temp_length = (*array)->current_num_col + strlen((char*)vptr) + 1;
+            if ((*array)->total_num_cols < temp_length) {
+                // Check to see if the added data to the string structure exceeds the current memory buffer.
+                // Take the current length and add extra memory for furture adds.
+                (*array)->total_num_cols = temp_length + (*array)->col_incrementation;
+                // Realloc the char pointer within the string structure for the new lenght.
+                column_reallocation(array, (*array)->total_num_cols);
+            }
+            // Need to subtract one from the temp length due to its addition of the null terminator.
+            (*array)->current_num_col = (temp_length - 1);
+            // Add the incoming data to the char pointer within the string structure.
+            strcat((*array)->array, (char*)vptr);
+
+            free(vptr);
         }
 
-        // At this point vptr should all be a char pointer
-        int temp_length = (*array)->current_num_col + strlen((char*)vptr) + 1;
-        if ((*array)->total_num_cols < temp_length) {
-            // Check to see if the added data to the string structure exceeds the current memory buffer.
-            // Take the current length and add extra memory for furture adds.
-            (*array)->total_num_cols = temp_length + (*array)->col_incrementation;
-            // Realloc the char pointer within the string structure for the new lenght.
-            column_reallocation(array, (*array)->total_num_cols);
-        }
-        // Need to subtract one from the temp length due to its addition of the null terminator.
-        (*array)->current_num_col = (temp_length - 1);
-        // Add the incoming data to the char pointer within the string structure.
-        strcat((*array)->array, (char*)vptr);
+        sfree(&format_holder);
 
         va_end(arguments);
-        free(vptr);
     } else {
-        if (string_debugger_flag) printf("WARNING: You sent in a NULL pointer...\n");
+        printf("WARNING: You sent in a NULL pointer...\n");
     }
     
 	if (string_debugger_flag) printf("Leaving the sadd funtion.\n");
@@ -312,7 +337,7 @@ int sinsert(string ** array, int position, const char * format, ...) {
         free(vptr);
         va_end(arguments);
     } else {
-        if (string_debugger_flag) printf("WARNING: You sent in a NULL pointer...\n");
+        printf("WARNING: You sent in a NULL pointer...\n");
     }
 
     if (string_debugger_flag) printf("Leaving the sinsert funtion.\n");
@@ -342,7 +367,7 @@ int soccurences(string * array, char find_char) {
                 total_occurences++;
         }
     } else {
-        if (string_debugger_flag) printf("WARNING: You sent in a NULL pointer...\n");
+        printf("WARNING: You sent in a NULL pointer...\n");
     }
 
 	if (string_debugger_flag) printf("Leaving the soccurences function.\n");
@@ -416,11 +441,11 @@ int stokenize(string ** array, char token_char) {
             }
             free(token);
         } else {
-            if (string_debugger_flag) printf("WARNING: There were no characters found like that in the following string: %s\n", (*array)->array);
+            printf("WARNING: There were no characters found like that in the following string: %s\n", (*array)->array);
             return 1;
         }
     } else {
-        if (string_debugger_flag) printf("WARNING: You sent in a NULL pointer...\n");
+        printf("WARNING: You sent in a NULL pointer...\n");
     }
 
 	if (string_debugger_flag) printf("Leaving the stokenize function.\n");
@@ -517,7 +542,7 @@ void schar_delete(string ** array, char * remove_characters) {
         // Free the temporary array.
         free(ptr);
     } else {
-        if (string_debugger_flag) printf("WARNING: You sent in a NULL pointer...\n");
+        printf("WARNING: You sent in a NULL pointer...\n");
     }
 
 	if (string_debugger_flag) printf("Leaving the schar_delete funtion.\n");
@@ -550,18 +575,18 @@ void schar_group_delete(string ** array, int starting_position, int ending_posit
         if (starting_position > (*array)->current_num_col || starting_position < 0) {
             // Check to make sure that the starting position is some where within the length of the string structure array.
             if (starting_position > (*array)->current_num_col) 
-                if (string_debugger_flag) printf("WARNING: Your starting position is greater than the current length of the string.\n");
+                printf("WARNING: Your starting position is greater than the current length of the string.\n");
             if (starting_position < 0)
-                if (string_debugger_flag) printf("WARNING: Your starting position is less than zero.\n");
+                printf("WARNING: Your starting position is less than zero.\n");
             return;
         }
 
         if (ending_position > (*array)->current_num_col || ending_position < 0) {
             // Check to make sure that the ending position is some where within the length of the string structure array.
             if (ending_position > (*array)->current_num_col) 
-                if (string_debugger_flag) printf("WARNING: Your ending position is greater than the current length of the string.\n");
+                printf("WARNING: Your ending position is greater than the current length of the string.\n");
             if (ending_position < 0)
-                if (string_debugger_flag) printf("WARNING: Your ending position is less than zero.\n");
+                printf("WARNING: Your ending position is less than zero.\n");
             return;
         }
 
@@ -593,7 +618,7 @@ void schar_group_delete(string ** array, int starting_position, int ending_posit
         // Cleanup
         free(temp);
     } else {
-        if (string_debugger_flag) printf("WARNING: You sent in a NULL pointer...\n");
+        printf("WARNING: You sent in a NULL pointer...\n");
     }
 
 	if (string_debugger_flag) printf("Leaving the schar_groupd_delete funtion.\n");
@@ -639,7 +664,7 @@ void sremove_leading_and_trailing_spaces(string ** array) {
         // Have to add a one to the ending point since it is zero based, and have to convert it to one base.
         (*array)->current_num_col -= ((*array)->current_num_col - (ending_point + 1));
     } else {
-        if (string_debugger_flag) printf("WARNING: You sent in a NULL pointer...\n");
+        printf("WARNING: You sent in a NULL pointer...\n");
     }
 
 	if (string_debugger_flag) printf("Leaving the sremove_leading_and_trailing_spaces funtion.\n");
@@ -672,7 +697,7 @@ void sclear(string ** array) {
         
         (*array)->current_num_col = 0;
     } else {
-        if (string_debugger_flag) printf("WARNING: You sent in a NULL pointer...\n");
+        printf("WARNING: You sent in a NULL pointer...\n");
     }
 
     if (string_debugger_flag) printf("Leaving the sclear function.\n");
@@ -724,7 +749,7 @@ int sreset(string ** array, int number_of_columns, int col_incrementation) {
         
         (*array)->current_num_col = 0;
     } else {
-        if (string_debugger_flag) printf("WARNING: You sent in a NULL pointer...\n");
+        printf("WARNING: You sent in a NULL pointer...\n");
     }
 
     if (string_debugger_flag) printf("Leaving the sreset function.\n");
@@ -753,7 +778,7 @@ void sfree(string ** array) {
         free((*array)->array);
         free((*array));
     } else {
-        if (string_debugger_flag) printf("WARNING: You sent in a NULL pointer...\n");
+        printf("WARNING: You sent in a NULL pointer...\n");
     }
 
 	if (string_debugger_flag) printf("Leaving the sfree funtion\n");
