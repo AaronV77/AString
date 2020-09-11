@@ -205,9 +205,9 @@ int main() {
         return 1;
     }
 
-    // Test-6 (new function)
+    // Test-6 (schar_group_delete)
     test_id = 6;
-    printf("Testing new function...\n");
+    printf("Testing schar_group_delete...\n");
     schar_group_delete(&cstring, 0, 1);
 
     if (strcmp(cstring->array, "aron Valoroso")) {
@@ -241,9 +241,9 @@ int main() {
     sclear(&cstring);
     sadd(&cstring, "string", "Aar");
 
-    // Test-7 (sremove)
+    // Test-7 (schar_detele)
     test_id = 7;
-    printf("Testing sremove...\n");
+    printf("Testing schar_delete...\n");
     schar_delete(&cstring, "Aa");
 
     if (strcmp(cstring->array, "r")) {
@@ -256,8 +256,36 @@ int main() {
         return 1;
     }
 
-    // Test-8 (sclear)
+    // Test-8 (strunc)
     test_id = 8;
+    printf("Testing strunc...\n");
+    sclear(&cstring);
+    sadd(&cstring, "string", "Aaron Valoroso");
+    strunc(&cstring, 0, ' ');
+
+    if (strcmp(cstring->array, "Aaron")) {
+        printf("Test-%d-1 Failure: The char pointer in the string structure is %s and should be %s.\n", test_id, cstring->array, "Aaron");
+        return 1;
+    }
+
+    if (cstring->current_num_col != 5) {
+        printf("Test-%d-2 Failure: The current_num_col in the string structure is %d and should be %d.\n", test_id, cstring->current_num_col, 5);
+        return 1;
+    }
+
+    strunc(&cstring, 3, 0);
+    if (strcmp(cstring->array, "Aar")) {
+        printf("Test-%d-3 Failure: The char pointer in the string structure is %s and should be %s.\n", test_id, cstring->array, "Aar");
+        return 1;
+    }
+
+    if (cstring->current_num_col != 3) {
+        printf("Test-%d-2 Failure: The current_num_col in the string structure is %d and should be %d.\n", test_id, cstring->current_num_col, 3);
+        return 1;
+    }
+
+    // Test-9 (sclear)
+    test_id = 9;
     printf("Testing sclear...\n");
     sclear(&cstring);
 
@@ -281,8 +309,8 @@ int main() {
         return 0;
     }
 
-    // Test-9 (sremove_leading_and_trailing_spaces)
-    test_id = 9;
+    // Test-10 (sremove_leading_and_trailing_spaces)
+    test_id = 10;
     printf("Testing sremove_leading_and_trailing_spaces...\n");
     sadd(&cstring, "string", "    Aaron Valoroso    ");
     sremove_leading_and_trailing_spaces(&cstring);
@@ -311,8 +339,8 @@ int main() {
     // This is for the next test.
     stokenize(&cstring, ' ');
 
-    // Test-10 (sreset)
-    test_id = 10;
+    // Test-11 (sreset)
+    test_id = 11;
     printf("Testing sreset...\n");
     sreset(&cstring, 120, 10);
 
