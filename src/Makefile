@@ -1,5 +1,5 @@
 all:
-	gcc -std=c99 -c astring.c 
+	gcc -fPIC -std=c99 -c astring.c 
 
 debug:
 	gcc -std=c99 -c astring.c -g
