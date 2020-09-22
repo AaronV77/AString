@@ -7,6 +7,10 @@ debug:
 archive: all
 	ar rcs astring.a astring.o
 
+onyxarchive:
+	gcc -fPIC -std=c99 -c astring.c
+	ar rcs astring.a astring.o
+
 archive_debug: debug
 	ar rcs astring.a astring.o
 
