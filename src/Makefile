@@ -1,10 +1,14 @@
 all:
-	gcc -fPIC -std=c99 -c astring.c 
+	gcc -std=c99 -c astring.c 
 
 debug:
 	gcc -std=c99 -c astring.c -g
 
 archive: all
+	ar rcs astring.a astring.o
+
+onyxarchive:
+	gcc -fPIC -std=c99 -c astring.c
 	ar rcs astring.a astring.o
 
 archive_debug: debug
