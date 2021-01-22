@@ -36,18 +36,18 @@ int soccurences(string * array, char find_char);
 
 int stokenize(string ** array, char token_char);
 
-void strunc(string ** array, int position, char character);
+int strunc(string ** array, int position, char character);
 
-void schar_delete(string ** array, char * remove_characters);
+int schar_delete(string ** array, char * remove_characters);
 
-void schar_group_delete(string ** array, int starting_position, int ending_position);
+int schar_group_delete(string ** array, int starting_position, int ending_position);
 
-void sremove_leading_and_trailing_spaces(string ** array);
+int sremove_leading_and_trailing_spaces(string ** array);
 
-void sclear(string ** array);
+int sclear(string ** array);
 
 int sreset(string ** array, int number_of_columns, int col_incrementation);
 
-void sfree(string ** array);
+int sfree(string ** array);
 
 #endif

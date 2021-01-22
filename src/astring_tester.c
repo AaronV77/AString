@@ -4,6 +4,8 @@ int main() {
     int test_id = 0;
     string * cstring = salloc(256, 1);
 
+    printf("WARNING-This test is using the function 'sclear' before being tested, watchout for errors.\n");
+
     // Test-1 (salloc)
     test_id = 1;
     printf("Testing salloc...\n");
@@ -29,7 +31,7 @@ int main() {
     }
 
     if (cstring->current_num_col != strlen("Aaron Valoros")) {
-        printf("Test-%d-2 Failure: The current_num_col in the string structure is %d and should be %d.\n", test_id, cstring->current_num_col, strlen("Aaron Valoros"));
+        printf("Test-%d-2 Failure: The current_num_col in the string structure is %d and should be %ld.\n", test_id, cstring->current_num_col, strlen("Aaron Valoros"));
         return 1;
     }
 
@@ -40,7 +42,7 @@ int main() {
     }
 
     if (cstring->current_num_col != strlen("Aaron Valoroso")) {
-        printf("Test-%d-4 Failure: The current_num_col in the string structure is %d and should be %d.\n", test_id, cstring->current_num_col, strlen("Aaron Valoroso"));
+        printf("Test-%d-4 Failure: The current_num_col in the string structure is %d and should be %ld.\n", test_id, cstring->current_num_col, strlen("Aaron Valoroso"));
         return 1;
     }
 
@@ -92,7 +94,7 @@ int main() {
     }
 
     if (cstring->current_num_col != strlen("Aaron Anthony Valoroso")) {
-        printf("Test-%d-2 Failure: The current_num_col in the string structure is %d and should be %d.\n", test_id, cstring->current_num_col, strlen("Aaron Valoroso"));
+        printf("Test-%d-2 Failure: The current_num_col in the string structure is %d and should be %ld.\n", test_id, cstring->current_num_col, strlen("Aaron Valoroso"));
         return 1;
     }
     
@@ -103,7 +105,7 @@ int main() {
     }
 
     if (cstring->current_num_col != strlen("AAAaron Anthony Valoroso")) {
-        printf("Test-%d-4 Failure: The current_num_col in the string structure is %d and should be %d.\n", test_id, cstring->current_num_col, strlen("Aaron Anthony Valoroso"));
+        printf("Test-%d-4 Failure: The current_num_col in the string structure is %d and should be %ld.\n", test_id, cstring->current_num_col, strlen("Aaron Anthony Valoroso"));
         return 1;
     }
 
@@ -114,7 +116,7 @@ int main() {
     }
 
     if (cstring->current_num_col != strlen("AAAaron Anthony Valorosooo")) {
-        printf("Test-%d-6 Failure: The current_num_col in the string structure is %d and should be %d.\n", test_id, cstring->current_num_col, strlen("AAAaron Anthony Valorosooo"));
+        printf("Test-%d-6 Failure: The current_num_col in the string structure is %d and should be %ld.\n", test_id, cstring->current_num_col, strlen("AAAaron Anthony Valorosooo"));
         return 1;
     }
 
@@ -125,7 +127,7 @@ int main() {
     }
 
     if (cstring->current_num_col != strlen("AAAAaron Anthony Valorosooo")) {
-        printf("Test-%d-8 Failure: The current_num_col in the string structure is %d and should be %d.\n", test_id, cstring->current_num_col, strlen("AAAAaron Anthony Valorosooo"));
+        printf("Test-%d-8 Failure: The current_num_col in the string structure is %d and should be %ld.\n", test_id, cstring->current_num_col, strlen("AAAAaron Anthony Valorosooo"));
         return 1;
     }
     
@@ -136,7 +138,7 @@ int main() {
     }
 
     if (cstring->current_num_col != strlen("AAAAaron AAnthony Valorosooo")) {
-        printf("Test-%d-10 Failure: The current_num_col in the string structure is %d and should be %d.\n", test_id, cstring->current_num_col, strlen("AAAAaron AAnthony Valorosooo"));
+        printf("Test-%d-10 Failure: The current_num_col in the string structure is %d and should be %ld.\n", test_id, cstring->current_num_col, strlen("AAAAaron AAnthony Valorosooo"));
         return 1;
     }
 
@@ -147,7 +149,7 @@ int main() {
     }
 
     if (cstring->current_num_col != strlen("AAAAaron AAnthony Valorosoooo")) {
-        printf("Test-%d-12 Failure: The current_num_col in the string structure is %d and should be %d.\n", test_id, cstring->current_num_col, strlen("AAAAaron AAnthony Valorosoooo"));
+        printf("Test-%d-12 Failure: The current_num_col in the string structure is %d and should be %ld.\n", test_id, cstring->current_num_col, strlen("AAAAaron AAnthony Valorosoooo"));
         return 1;
     }
 
@@ -235,7 +237,7 @@ int main() {
     }
 
     if (cstring->current_num_col != strlen("aroalo")) {
-        printf("Test-%d-4 Failure: The current_num_col in the string structure is %d and should be %d.\n", test_id, cstring->current_num_col, strlen("aroalo"));
+        printf("Test-%d-4 Failure: The current_num_col in the string structure is %d and should be %ld.\n", test_id, cstring->current_num_col, strlen("aroalo"));
         return 1;
     }
 
@@ -297,7 +299,7 @@ int main() {
     sclear(&cstring);
 
     if (strlen(cstring->array) != 0) {
-        printf("Test-%d-1 Failure: The char pointer in the string structure is %d and should be %d.\n", test_id, strlen(cstring->array), 0);
+        printf("Test-%d-1 Failure: The char pointer in the string structure is %ld and should be %d.\n", test_id, strlen(cstring->array), 0);
         return 1;
     }
 
@@ -328,7 +330,7 @@ int main() {
     }
 
     if (cstring->current_num_col != strlen("Aaron Valoroso")) {
-        printf("Test-%d-2 Failure: The current_num_col in the string structure is %d and should be %d.\n", test_id, cstring->current_num_col, strlen("Aaron Valoroso"));
+        printf("Test-%d-2 Failure: The current_num_col in the string structure is %d and should be %ld.\n", test_id, cstring->current_num_col, strlen("Aaron Valoroso"));
         return 1;
     }
 
@@ -339,7 +341,7 @@ int main() {
     }
 
     if (cstring->current_num_col != strlen("Aaron Valoroso")) {
-        printf("Test-%d-4 Failure: The current_num_col in the string structure is %d and should be %d.\n", test_id, cstring->current_num_col, strlen("Aaron Valoroso"));
+        printf("Test-%d-4 Failure: The current_num_col in the string structure is %d and should be %ld.\n", test_id, cstring->current_num_col, strlen("Aaron Valoroso"));
         return 1;
     }    
 
@@ -352,7 +354,7 @@ int main() {
     sreset(&cstring, 120, 10);
 
     if (strlen(cstring->array) != 0) {
-        printf("Test-%d-1 Failure: The char pointer in the string structure is %d and should be %d.\n", test_id, strlen(cstring->array), 0);
+        printf("Test-%d-1 Failure: The char pointer in the string structure is %ld and should be %d.\n", test_id, strlen(cstring->array), 0);
         return 1;
     }
 
