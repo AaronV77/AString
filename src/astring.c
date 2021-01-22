@@ -207,6 +207,7 @@ int sadd(string ** array, const char * format, ...) {
                 printf("ERROR: The given data type is not supported.\n");
                 if (string_debugger_flag) printf("Leaving the sadd funtion.\n");
                 va_end(arguments);
+                if (string_debugger_flag) printf("Leaving the sadd funtion.\n");
                 return 1;
             }
 
@@ -230,13 +231,13 @@ int sadd(string ** array, const char * format, ...) {
         sfree(&format_holder);
 
         va_end(arguments);
-    } else {
+        if (string_debugger_flag) printf("Leaving the sadd funtion.\n");
+        return 0;
+    } else
         printf("WARNING: You sent in a NULL pointer...\n");
-    }
     
 	if (string_debugger_flag) printf("Leaving the sadd funtion.\n");
-
-	return 0;
+	return 1;
 }
 
 //-----------------------------------------------------------------------------------------------------
@@ -336,13 +337,14 @@ int sinsert(string ** array, int position, const char * format, ...) {
         free(temp);
         free(vptr);
         va_end(arguments);
-    } else {
+
+        if (string_debugger_flag) printf("Leaving the sinsert funtion.\n");
+        return 0;
+    } else
         printf("WARNING: You sent in a NULL pointer...\n");
-    }
 
     if (string_debugger_flag) printf("Leaving the sinsert funtion.\n");
-    
-    return 0;
+    return 1;
 }
 
 //-----------------------------------------------------------------------------------------------------
@@ -366,12 +368,10 @@ int soccurences(string * array, char find_char) {
             if (array->array[i] == find_char)
                 total_occurences++;
         }
-    } else {
+    } else
         printf("WARNING: You sent in a NULL pointer...\n");
-    }
 
 	if (string_debugger_flag) printf("Leaving the soccurences function.\n");
-
     return total_occurences;
 }
 
@@ -427,6 +427,7 @@ int stokenize(string ** array, char token_char) {
                     (*array)->tokens[(*array)->total_num_tokens] = calloc(strlen(token) + 1, sizeof(char));
                     if (!(*array)->tokens[(*array)->total_num_tokens]) {
                         printf("ERROR: There was an issue with the second calloc call.\n");
+                        if (string_debugger_flag) printf("Leaving the stokenize function.\n");
                         return 1;
                     }
 
@@ -439,18 +440,17 @@ int stokenize(string ** array, char token_char) {
                     token_iterator++;
                 }
             }
+            if (string_debugger_flag) printf("Leaving the stokenize function.\n");
             free(token);
-        } else {
+            
+            return 0;
+        } else
             printf("WARNING: There were no characters found like that in the following string: %s\n", (*array)->array);
-            return 1;
-        }
-    } else {
+    } else
         printf("WARNING: You sent in a NULL pointer...\n");
-    }
 
 	if (string_debugger_flag) printf("Leaving the stokenize function.\n");
-
-    return 0;
+    return 1;
 }
 
 //-----------------------------------------------------------------------------------------------------
@@ -464,10 +464,10 @@ int stokenize(string ** array, char token_char) {
  * \param[in] array: is a string structure.
  * \param[in] position: is an integer that tells the function where a null terminator needs to be added.
  * \param[in] character: is a char character that tells the function on where a null terminator needs to be added.
- * \param[out] return (on success): will be an integer value of zero.
- * \param[out] return (on failure): will be an integer value of one.
+ * \param[out] return (on success): will be an integer value of zero and a truncated char pointer.
+ * \param[out] return (on failure): will be an integer value of one and a unedited char pointer.
  */
-void strunc(string ** array, int position, char character) {
+int strunc(string ** array, int position, char character) {
 
 	if (string_debugger_flag) printf("Entering the strunc function.\n");
 
@@ -479,36 +479,40 @@ void strunc(string ** array, int position, char character) {
                 if ((*array)->array[i] == character) {
                     (*array)->array[i] = '\0';
                     (*array)->current_num_col = i;
-                    break;
+
+                    if (string_debugger_flag) printf("Leaving the strunc funtion.\n");
+                    return 0;
                 }
             }
         } else {
             // Put a null terminator at a specific place in the string. 
             (*array)->array[position] = '\0';
             (*array)->current_num_col = position;
+
+            if (string_debugger_flag) printf("Leaving the strunc funtion.\n");
+            return 0;            
         }
-    } else {
+    } else
         if (string_debugger_flag) printf("WARNING: You sent in a NULL pointer...\n");
-    }
 
 	if (string_debugger_flag) printf("Leaving the strunc funtion.\n");
-
-    return;
+    return 1;
 }
 
 //-----------------------------------------------------------------------------------------------------
 /**
  * This function will take in a string structure and remove all characters that were passed into this function
- * from the char pointer in the structure. The function will create a temporary pointer with the same amount of
- * memory and loop through all of the characters in the char pointer of the string structure. Each characters is
- * checked against the remove characters pointer. All characters that do not consist of any characters from the 
- * remove characters pointer are added to the temporary pointer. Once finished, the system will clear the string
- * structure, and add the temporary pointer to the string structure.
+ * from the char pointer in the structure. Each characters is checked against the remove characters pointer. All 
+ * characters that do not consist of any characters from the remove characters pointer are added to the temporary 
+ * pointer. Once finished, the system will clear the string structure, and add the temporary pointer to the string 
+ * structure.
  *
  * \param[in] array: is a string structure.
  * \param[in] remove_characters: is a char pointer that holds characters to be removed from said string.
+ * \param[out] return (on success): will be an integer value of zero and an updated char pointer.
+ * \param[out] return (on failure): will be an integer value of one and the original char pointer. 
  */
-void schar_delete(string ** array, char * remove_characters) {
+int schar_delete(string ** array, char * remove_characters) {
 
 	if (string_debugger_flag) printf("Entering the schar_delete function.\n");
 
@@ -541,22 +545,23 @@ void schar_delete(string ** array, char * remove_characters) {
         sadd(array, "string", ptr);
         // Free the temporary array.
         free(ptr);
-    } else {
+
+        if (string_debugger_flag) printf("Leaving the schar_delete funtion.\n");
+        return 0;
+    } else
         printf("WARNING: You sent in a NULL pointer...\n");
-    }
 
 	if (string_debugger_flag) printf("Leaving the schar_delete funtion.\n");
-
-    return;
+    return 1;
 }
 
 //-----------------------------------------------------------------------------------------------------
 /**
- * This function will take the string structure and either remove a group of characters or a single character
- * from the char pointer in the string structure. The function first checks to make sure that the user is not
- * doing anything silly by giving false starting and ending positions, and then to see if they are just trying
- * to clear the entire char pointer in the string structure. Next, if they are not doing anything silly, I check
- * to see where the user is trying to remove characters from the char pointer and update a new temporary char 
+ * This function will take a string structure remove a group of characters from the given char pointer in the 
+ * string structure. The function first checks to make sure that the user is not doing anything silly by 
+ * giving a false starting and ending position, and then to see if they are just trying to clear the entire 
+ * char pointer in the string structure. Next, if they are not doing anything silly, I check to see where the 
+ * user is trying to remove characters from the char pointer and update a new temporary char 
  * pointer with the data that they want to keep. Once, finished, I reset the char pointer and the number of 
  * characters in the string structure to the update data. Lastly, the starting and ending position are zero
  * based.
@@ -564,10 +569,10 @@ void schar_delete(string ** array, char * remove_characters) {
  * \param[in] array: is a string structure.
  * \param[in] starting_position: is an integer that tells the function the starting position for removing characters is.
  * \param[in] ending_position: is an integer that tells the function the ending position to stop removing characters.
- * \param[out] return (on success): will be a string structure with an update char pointer.
- * \param[out] return (on failure): will be keep all the original data that was sent in.
+ * \param[out] return (on success): will be an integer value of zero and a string structure with an update char pointer.
+ * \param[out] return (on failure): will be an integer value of one and the original data that was sent in.
  */
-void schar_group_delete(string ** array, int starting_position, int ending_position) {
+int schar_group_delete(string ** array, int starting_position, int ending_position) {
 
 	if (string_debugger_flag) printf("Entering the schar_groupd_delete function.\n");
 
@@ -578,7 +583,8 @@ void schar_group_delete(string ** array, int starting_position, int ending_posit
                 printf("WARNING: Your starting position is greater than the current length of the string.\n");
             if (starting_position < 0)
                 printf("WARNING: Your starting position is less than zero.\n");
-            return;
+            if (string_debugger_flag) printf("Leaving the schar_groupd_delete funtion.\n");
+            return 1;
         }
 
         if (ending_position > (*array)->current_num_col || ending_position < 0) {
@@ -587,13 +593,15 @@ void schar_group_delete(string ** array, int starting_position, int ending_posit
                 printf("WARNING: Your ending position is greater than the current length of the string.\n");
             if (ending_position < 0)
                 printf("WARNING: Your ending position is less than zero.\n");
-            return;
+            if (string_debugger_flag) printf("Leaving the schar_groupd_delete funtion.\n");
+            return 1;
         }
 
         if ((ending_position - starting_position) == (*array)->current_num_col) {
             // Check to see if the user is trying to delete the whole array.
             sclear(array);
-            return;
+            if (string_debugger_flag) printf("Leaving the schar_groupd_delete funtion.\n");
+            return 0;
         }
 
         char * temp = calloc((*array)->current_num_col + 1, sizeof(char));
@@ -617,13 +625,14 @@ void schar_group_delete(string ** array, int starting_position, int ending_posit
         (*array)->current_num_col -= (ending_position - starting_position);
         // Cleanup
         free(temp);
-    } else {
+
+        if (string_debugger_flag) printf("Leaving the schar_groupd_delete funtion.\n");
+        return 0;
+    } else
         printf("WARNING: You sent in a NULL pointer...\n");
-    }
 
 	if (string_debugger_flag) printf("Leaving the schar_groupd_delete funtion.\n");
-
-    return;
+    return 1;
 }
 
 //-----------------------------------------------------------------------------------------------------
@@ -635,8 +644,10 @@ void schar_group_delete(string ** array, int starting_position, int ending_posit
  * structure and then NULL terminate the ending porition of the char pointer to remove the trailing spaces.
  *
  * \param[in] array: is a string structure..
+ * \param[out] return (on success): will be an integer value of zero and a string structure with an update char pointer.
+ * \param[out] return (on failure): will be an integer value of one and the original data that was sent in.
  */
-void sremove_leading_and_trailing_spaces(string ** array) {
+int sremove_leading_and_trailing_spaces(string ** array) {
 
 	if (string_debugger_flag) printf("Entering the sremove_leading_and_trailing_spaces function.\n");
 
@@ -663,13 +674,14 @@ void sremove_leading_and_trailing_spaces(string ** array) {
         (*array)->array[ending_point + 1] = '\0';
         // Have to add a one to the ending point since it is zero based, and have to convert it to one base.
         (*array)->current_num_col -= ((*array)->current_num_col - (ending_point + 1));
-    } else {
+
+        if (string_debugger_flag) printf("Leaving the sremove_leading_and_trailing_spaces funtion.\n");
+        return 0;
+    } else
         printf("WARNING: You sent in a NULL pointer...\n");
-    }
 
 	if (string_debugger_flag) printf("Leaving the sremove_leading_and_trailing_spaces funtion.\n");
-
-    return;
+    return 1;
 }
 
 //-----------------------------------------------------------------------------------------------------
@@ -679,8 +691,10 @@ void sremove_leading_and_trailing_spaces(string ** array) {
  * then cleaned and the total number of elements in the array is set to zero.
  *
  * \param[in] array: is a string structure.
+ * \param[out] return (on success): will be an integer value of zero and an emptied string structure.
+ * \param[out] return (on failure): will be an integer value of one and the original data that was sent in. 
  */
-void sclear(string ** array) {
+int sclear(string ** array) {
     
     if (string_debugger_flag) printf("Entering the sclear function.\n");
 
@@ -696,13 +710,14 @@ void sclear(string ** array) {
         memset((*array)->array, 0, (*array)->total_num_cols * sizeof(char));
         
         (*array)->current_num_col = 0;
-    } else {
+
+        if (string_debugger_flag) printf("Leaving the sclear function.\n");
+        return 0; 
+    } else
         printf("WARNING: You sent in a NULL pointer...\n");
-    }
 
     if (string_debugger_flag) printf("Leaving the sclear function.\n");
-
-    return;
+    return 1;
 }
 
 //-----------------------------------------------------------------------------------------------------
@@ -716,8 +731,8 @@ void sclear(string ** array) {
  * \param[in] array: is a string structure.
  * \param[in] number_of_columns: is an integer that holds how many elements need to be in the char pointer.
  * \param[in] col_incrementation: is a integer that tells the library how many elements need to be incremented to the pointer when the pointer is filled with data. 
- * \param[out] return (on success): will be an integer value of zero.
- * \param[out] return (on failure): will be an integer value of one.
+ * \param[out] return (on success): will be an integer value of zero and updated string structure.
+ * \param[out] return (on failure): will be an integer value of one and the original string structure.
  */
 int sreset(string ** array, int number_of_columns, int col_incrementation) {
 
@@ -731,7 +746,7 @@ int sreset(string ** array, int number_of_columns, int col_incrementation) {
             (*array)->array = realloc((*array)->array, number_of_columns * sizeof(char));
             if (!(*array)->array) {
                 printf("ERROR: There was an issue with reallocating the given pointer.\n");
-                if (string_debugger_flag) printf("Leaving the sclear function.\n");
+                if (string_debugger_flag) printf("Leaving the sreset function.\n");
                 return 1;
             }
             (*array)->total_num_cols = number_of_columns;
@@ -746,15 +761,15 @@ int sreset(string ** array, int number_of_columns, int col_incrementation) {
         }
 
         memset((*array)->array, 0, (*array)->total_num_cols * sizeof(char));
-        
         (*array)->current_num_col = 0;
-    } else {
+
+        if (string_debugger_flag) printf("Leaving the sreset function.\n");
+        return 0;
+    } else
         printf("WARNING: You sent in a NULL pointer...\n");
-    }
 
     if (string_debugger_flag) printf("Leaving the sreset function.\n");
-    
-    return 0;
+    return 1;
 }
 
 //-----------------------------------------------------------------------------------------------------
@@ -763,8 +778,10 @@ int sreset(string ** array, int number_of_columns, int col_incrementation) {
  * that holds the string data, and the string structure pointer itself. 
  *
  * \param[in] array: is a string structure.
+ * \param[out] return (on success): will be an integer value of zero and updated string structure.
+ * \param[out] return (on failure): will be an integer value of one and the original string structure. 
  */
-void sfree(string ** array) {
+int sfree(string ** array) {
 
 	if (string_debugger_flag) printf("Entering the sfree function.\n");
 
@@ -777,11 +794,12 @@ void sfree(string ** array) {
 
         free((*array)->array);
         free((*array));
-    } else {
+
+        if (string_debugger_flag) printf("Leaving the sfree funtion\n");
+        return 0;
+    } else
         printf("WARNING: You sent in a NULL pointer...\n");
-    }
 
 	if (string_debugger_flag) printf("Leaving the sfree funtion\n");
-
-	return;
+	return 1;
 }
