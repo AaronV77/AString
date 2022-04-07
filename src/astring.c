@@ -398,10 +398,13 @@ int stokenize(string ** array, char token_char) {
 	if (string_debugger_flag) printf("Entering the stokenize function.\n");
 
     if ((*array)) {
+        // Note: See how many characters are within the string.
         int character_occurences = soccurences((*array), token_char);
+        // Note: If there are occurences of the given character then procced, else leave.
         if (character_occurences) {
-
+            // Note: Check to see if there were tokens already found. 
             if ((*array)->tokens) {
+                // Note: Loop through the found tokens for the string and free everything.
                 for (int i = 0; i < (*array)->total_num_tokens; ++i)
                     free((*array)->tokens[i]);
                 free((*array)->tokens);
@@ -409,7 +412,7 @@ int stokenize(string ** array, char token_char) {
                 (*array)->total_num_tokens = 0;
             }
 
-            // Have to add another one to the character_occurences because of the extra token at the end.
+            // Note: Have to add another one to the character_occurences because of the extra token at the end.
             (*array)->tokens = calloc(character_occurences + 1, sizeof(char*));
             if (!(*array)->tokens) {
                 printf("ERROR: There was an issue with the first calloc call.\n");
@@ -417,36 +420,59 @@ int stokenize(string ** array, char token_char) {
             }
 
             int token_iterator = 0;
+            // Note: Temporary token array for storing the given tokens.
             char * token = calloc(256, sizeof(char));
+
+            // Note: Loop through the passed in char array.
             for (int i = 0; i < (*array)->current_num_col; i++) {
-                // Have to check to see if we are at the end of the string to grab the last token.
+                // Note: Check to see if we found a token character or we are at the end of the string.
                 if (((*array)->array[i] == token_char) || (i == ((*array)->current_num_col - 1))) {
-                    // Add the last character to the token since we are at the end of the string.
-                    if (i == (*array)->current_num_col -1)
+                    // Note: Check to see if we are at the end of the char array and the token we are adding is not the token character.
+                    if (i == (*array)->current_num_col -1 && (*array)->array[i] != token_char) 
+                    {
+                        // Note: Add the last character to the token from the char array.
                         token[token_iterator] = (*array)->array[i];
-                    (*array)->tokens[(*array)->total_num_tokens] = calloc(strlen(token) + 1, sizeof(char));
-                    if (!(*array)->tokens[(*array)->total_num_tokens]) {
-                        printf("ERROR: There was an issue with the second calloc call.\n");
-                        if (string_debugger_flag) printf("Leaving the stokenize function.\n");
-                        return 1;
                     }
 
-                    strcpy((*array)->tokens[(*array)->total_num_tokens], token);
-                    (*array)->total_num_tokens++;  
-                    memset(token, 0, 256 * sizeof(char));          
-                    token_iterator = 0;
+                    // Note: Check to make sure that the token actually has characters in it before adding it.
+                    if (strlen(token) > 0)
+                    {
+                        // Note: Allocate memory for the found token.
+                        (*array)->tokens[(*array)->total_num_tokens] = calloc(strlen(token) + 1, sizeof(char));
+                        // Note: Check to see if the allocation of memory was successful.
+                        if (!(*array)->tokens[(*array)->total_num_tokens]) {
+                            printf("ERROR: There was an issue with the second calloc call.\n");
+                            if (string_debugger_flag) printf("Leaving the stokenize function.\n");
+                            return 1;
+                        }
+
+                        // Note: Copy the token string into the array of tokens.
+                        strcpy((*array)->tokens[(*array)->total_num_tokens], token);
+                        // Note: Increment the number of tokens.
+                        (*array)->total_num_tokens++;  
+                        // Note; Reset the token string.
+                        memset(token, 0, 256 * sizeof(char));    
+                        // Note: Reset the iterator used for saving characters into the token array.     
+                        token_iterator = 0;
+                    }
                 } else {
+                    // Note: Save the character from the given string into the temporary token string.
                     token[token_iterator] = (*array)->array[i];
+                    // Note; Increase the tokens index. 
                     token_iterator++;
                 }
             }
+
             if (string_debugger_flag) printf("Leaving the stokenize function.\n");
+            // Note: Cleanup the temp token array.
             free(token);
             
             return 0;
-        } else
+        } 
+        else
             printf("WARNING: There were no characters found like that in the following string: %s\n", (*array)->array);
-    } else
+    } 
+    else
         printf("WARNING: You sent in a NULL pointer...\n");
 
 	if (string_debugger_flag) printf("Leaving the stokenize function.\n");

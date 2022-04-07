@@ -4,6 +4,8 @@ int main() {
     int test_id = 0;
     string * cstring = salloc(256, 1);
 
+    printf("Welcome to the AString Test Suit\n");
+    printf("----------------------------------------------------------\n");
     printf("WARNING-This test is using the function 'sclear' before being tested, watchout for errors.\n");
 
     // Test-1 (salloc)
@@ -20,6 +22,9 @@ int main() {
         return 1;
     }
 
+    sclear(&cstring);
+
+    //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Test-2 (sadd)
     test_id = 2;
     printf("Testing sadd...\n");
@@ -81,10 +86,12 @@ int main() {
         return 1;
     }
 
+    sclear(&cstring);  
+
+    //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Test-3 (sinsert)
     test_id = 3;
     printf("Testing sinsert...\n");
-    sclear(&cstring);
     sadd(&cstring, "string", "Aaron Valoroso");
     sinsert(&cstring, 6, "string", "Anthony ");
 
@@ -165,12 +172,13 @@ int main() {
         return 1;
     }
 
-    sclear(&cstring);
-    sadd(&cstring, "string", "Aaron Valoroso");
-
+    sclear(&cstring);    
+    
+    //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Test-4 (soccurences)
     test_id = 4;
     printf("Testing soccurences...\n");
+    sadd(&cstring, "string", "Aaron Valoroso");
     int occurences = soccurences(cstring, ' ');
 
     if (occurences != 1) {
@@ -178,9 +186,13 @@ int main() {
         return 1;
     }
 
+    sclear(&cstring);
+
+    //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Test-5 (stokenize)
     test_id = 5;
     printf("Testing stokenize...\n");
+    sadd(&cstring, "string", " Aaron  Valoroso ");
     stokenize(&cstring, ' ');
 
     if (cstring->total_num_tokens != 2) {
@@ -197,26 +209,14 @@ int main() {
         printf("Test-%d-3 Failure: The second token in the string structure tokens is %s and should be %s.\n", test_id, cstring->tokens[1], "Valoroso");
         return 1;
     }
- 
-    stokenize(&cstring, ' ');
-    if (cstring->total_num_tokens != 2) {
-        printf("Test-%d-4 Failure: The total_num_tokens in the string structure is %d and should be %d.\n", test_id, cstring->total_num_tokens, 2);
-        return 1;
-    }
 
-    if (strcmp(cstring->tokens[0], "Aaron")) {
-        printf("Test-%d-5 Failure: The first token in the string structure tokens is %s and should be %s.\n", test_id, cstring->tokens[0], "Aaron");
-        return 1;
-    }
+    sclear(&cstring);
 
-    if (strcmp(cstring->tokens[1], "Valoroso")) {
-        printf("Test-%d-6 Failure: The second token in the string structure tokens is %s and should be %s.\n", test_id, cstring->tokens[1], "Valoroso");
-        return 1;
-    }
-
+    //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Test-6 (schar_group_delete)
     test_id = 6;
     printf("Testing schar_group_delete...\n");
+    sadd(&cstring, "string", "Aaron Valoroso");
     schar_group_delete(&cstring, 0, 1);
 
     if (strcmp(cstring->array, "aron Valoroso")) {
@@ -248,11 +248,12 @@ int main() {
     }
 
     sclear(&cstring);
-    sadd(&cstring, "string", "Aar");
-
+    
+    //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Test-7 (schar_detele)
     test_id = 7;
     printf("Testing schar_delete...\n");
+    sadd(&cstring, "string", "Aar");
     schar_delete(&cstring, "Aa");
 
     if (strcmp(cstring->array, "r")) {
@@ -265,10 +266,12 @@ int main() {
         return 1;
     }
 
+    sclear(&cstring);
+
+    //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Test-8 (strunc)
     test_id = 8;
     printf("Testing strunc...\n");
-    sclear(&cstring);
     sadd(&cstring, "string", "Aaron Valoroso");
     strunc(&cstring, 0, ' ');
 
@@ -293,9 +296,13 @@ int main() {
         return 1;
     }
 
+    sclear(&cstring);
+
+    //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Test-9 (sclear)
     test_id = 9;
     printf("Testing sclear...\n");
+    sadd(&cstring, "string", "Aaron Valoroso");
     sclear(&cstring);
 
     if (strlen(cstring->array) != 0) {
@@ -318,6 +325,9 @@ int main() {
         return 0;
     }
 
+    sclear(&cstring);
+
+    //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Test-10 (sremove_leading_and_trailing_spaces)
     test_id = 10;
     printf("Testing sremove_leading_and_trailing_spaces...\n");
@@ -343,12 +353,14 @@ int main() {
     if (cstring->current_num_col != strlen("Aaron Valoroso")) {
         printf("Test-%d-4 Failure: The current_num_col in the string structure is %d and should be %ld.\n", test_id, cstring->current_num_col, strlen("Aaron Valoroso"));
         return 1;
-    }    
+    }
 
+    sclear(&cstring);
+
+    //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Test-11 (schar-single-delete)
     test_id = 11;
     printf("Testing schar-single-delete...\n");
-    sclear(&cstring);
     sadd(&cstring, "string", "Valoroso");
     schar_single_delete(&cstring, 0);
 
@@ -386,14 +398,15 @@ int main() {
         return 1;
     }
 
-    // This is for the next test.
     sclear(&cstring);
-    sadd(&cstring, "string", "Aaron Valoroso");
-    stokenize(&cstring, ' ');
 
+    //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Test-12 (sreset)
     test_id = 12;
     printf("Testing sreset...\n");
+    sadd(&cstring, "string", "Aaron Valoroso");
+    stokenize(&cstring, ' ');
+
     sreset(&cstring, 120, 10);
 
     if (strlen(cstring->array) != 0) {
@@ -429,5 +442,7 @@ int main() {
     printf("To test the sfree function then make sure to use valgrind.\n");
     sfree(&cstring);
 
+    printf("----------------------------------------------------------\n");
+    printf("All tests passed inspection!\n");
     return 0;
 }
