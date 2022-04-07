@@ -345,11 +345,54 @@ int main() {
         return 1;
     }    
 
+    // Test-11 (schar-single-delete)
+    test_id = 11;
+    printf("Testing schar-single-delete...\n");
+    sclear(&cstring);
+    sadd(&cstring, "string", "Valoroso");
+    schar_single_delete(&cstring, 0);
+
+    if (strcmp(cstring->array, "aloroso")) {
+        printf("Test-%d-1 Failure: The char pointer in the string structure is %s and should be %s.\n", test_id, cstring->array, "aloroso");
+        return 1;
+    }
+
+    if (cstring->current_num_col != strlen("aloroso")) {
+        printf("Test-%d-2 Failure: The current_num_col in the string structure is %d and should be %ld.\n", test_id, cstring->current_num_col, strlen("aloroso"));
+        return 1;
+    }
+
+    schar_single_delete(&cstring, 1);
+
+    if (strcmp(cstring->array, "aoroso")) {
+        printf("Test-%d-1 Failure: The char pointer in the string structure is %s and should be %s.\n", test_id, cstring->array, "aoroso");
+        return 1;
+    }
+
+    if (cstring->current_num_col != strlen("aoroso")) {
+        printf("Test-%d-2 Failure: The current_num_col in the string structure is %d and should be %ld.\n", test_id, cstring->current_num_col, strlen("aoroso"));
+        return 1;
+    }
+
+    schar_single_delete(&cstring, cstring->current_num_col - 1);
+
+    if (strcmp(cstring->array, "aoros")) {
+        printf("Test-%d-1 Failure: The char pointer in the string structure is %s and should be %s.\n", test_id, cstring->array, "aoros");
+        return 1;
+    }
+
+    if (cstring->current_num_col != strlen("aoros")) {
+        printf("Test-%d-2 Failure: The current_num_col in the string structure is %d and should be %ld.\n", test_id, cstring->current_num_col, strlen("aoros"));
+        return 1;
+    }
+
     // This is for the next test.
+    sclear(&cstring);
+    sadd(&cstring, "string", "Aaron Valoroso");
     stokenize(&cstring, ' ');
 
-    // Test-11 (sreset)
-    test_id = 11;
+    // Test-12 (sreset)
+    test_id = 12;
     printf("Testing sreset...\n");
     sreset(&cstring, 120, 10);
 

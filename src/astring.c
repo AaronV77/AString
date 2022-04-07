@@ -518,32 +518,32 @@ int schar_delete(string ** array, char * remove_characters) {
 
     if ((*array)) {
         int temp_iterator = 0, add_flag = 0, number_of_characters = strlen(remove_characters);
-        // Create a temporary pointer that is the same size of the incoming array.
+        // Note: Create a temporary pointer that is the same size of the incoming array.
         char * ptr = calloc(((*array)->total_num_cols + 1), sizeof(char));
-        // Loop through the incoming array.
+        // Note: Loop through the incoming array.
         for (int i = 0; i < (*array)->current_num_col; ++i) {
             // Loop though all the characters being removed.
             for (int j = 0; j < number_of_characters; ++j) {
-                // Check to see if any of the characters in the array match any of the charcters to be removed.
+                // Note: Check to see if any of the characters in the array match any of the charcters to be removed.
                 if ((*array)->array[i] == remove_characters[j])
                     add_flag = 1;
             }
             
-            // Only add charcters to the temporary pointer if they don't match a removed character.
+            // Note: Only add charcters to the temporary pointer if they don't match a removed character.
             if (!add_flag)  {
-                // Add the character to the temporary pointer.
+                // Note: Add the character to the temporary pointer.
                 ptr[temp_iterator] = (*array)->array[i];
-                // Increase the temporary pointer iterator.
+                // Note: Increase the temporary pointer iterator.
                 temp_iterator++;
             }
             // Reset the add flag.
             add_flag = 0;
         }
-        // Clear the old array out for the new string.
+        // Note: Clear the old array out for the new string.
         sclear(array);
         // Add the new array to the old string, this will take care of current_num_col.
         sadd(array, "string", ptr);
-        // Free the temporary array.
+        // Note: Free the temporary array.
         free(ptr);
 
         if (string_debugger_flag) printf("Leaving the schar_delete funtion.\n");
@@ -552,6 +552,74 @@ int schar_delete(string ** array, char * remove_characters) {
         printf("WARNING: You sent in a NULL pointer...\n");
 
 	if (string_debugger_flag) printf("Leaving the schar_delete funtion.\n");
+    return 1;
+}
+
+//-----------------------------------------------------------------------------------------------------
+/**
+ * This function will take a string structure remove a single character from the given char pointer in the 
+ * string structure. The function first checks to make sure that the user is not doing anything silly by 
+ * giving a false position. Next, if the user is not doing anything silly, I check to see where the 
+ * user is trying to the single character from the char pointer and update a new temporary char 
+ * pointer with the data that they want to keep. Once, finished, I reset the char pointer and the number of 
+ * characters in the string structure to the update data. Lastly, the starting and ending position are zero
+ * based.
+ *
+ * \param[in] array: is a string structure.
+ * \param[in] position: is an integer that tells the function the starting position for removing characters is.
+ * \param[out] return (on success): will be an integer value of zero and a string structure with an update char pointer.
+ * \param[out] return (on failure): will be an integer value of one and the original data that was sent in.
+ */
+int schar_single_delete(string ** array, int position) {
+
+	if (string_debugger_flag) printf("Entering the schar_groupd_delete function.\n");
+
+    if ((*array)) 
+    {
+        // Note: Check to make sure that the starting position is some where within the length of the string structure array.
+        if (position > (*array)->current_num_col || position < 0) 
+        {
+            if (position > (*array)->current_num_col) 
+                printf("WARNING: Your starting position is greater than the current length of the string.\n");
+            if (position < 0)
+                printf("WARNING: Your starting position is less than zero.\n");
+            if (string_debugger_flag) printf("Leaving the schar_groupd_delete funtion.\n");
+            return 1;
+        }
+
+        // Note: Temporary char pointer for storing the new string.
+        char * temp = calloc((*array)->current_num_col + 1, sizeof(char));
+
+        // Note: Create a variable for storing the index to the temporary char pointer.
+        int counter = 0;
+        // Note: Loop through the incoming string array.
+        for (int i = 0; i < (*array)->current_num_col; ++i) 
+        {
+            // Note: If we get to the position for removing a character then skip it.
+            if (i == position)
+                continue;
+            // Note: Save all the wanted characters to the temporary char array.
+            temp[counter] = (*array)->array[i];
+            // Note: Update the temporary array index. 
+            counter++;
+        }
+        
+        // Note: Reset the original char pointer in the string structure.
+        memset((*array)->array, 0, (*array)->current_num_col * sizeof(char));
+        // Note: Copy the new data into the original char pointer.
+        strcpy((*array)->array, temp);
+        // Note: Update the number of current characters in the string.
+        (*array)->current_num_col -= 1;
+        // Note: Cleanup
+        free(temp);
+
+        if (string_debugger_flag) printf("Leaving the schar_groupd_delete funtion.\n");
+        return 0;
+    } 
+    else
+        printf("WARNING: You sent in a NULL pointer...\n");
+
+	if (string_debugger_flag) printf("Leaving the schar_groupd_delete funtion.\n");
     return 1;
 }
 
@@ -652,16 +720,27 @@ int sremove_leading_and_trailing_spaces(string ** array) {
 	if (string_debugger_flag) printf("Entering the sremove_leading_and_trailing_spaces function.\n");
 
     if ((*array)) {
-        int starting_point = -1, ending_point = 0;
+        int starting_point = 0, ending_point = 0;
+        // Note: Loop until we get a valid character for a starting point.
         for (int i = 0; i < (*array)->current_num_col; ++i) {
-            // This if statment is just suppose to grab the first character and then stop grabbing anymore after. 
-            if (starting_point == -1 && ((*array)->array[i] > 32 && (*array)->array[i] < 127))
+            // Note: Once we find a character, break from the loop. 
+            if (((*array)->array[i] > 32 && (*array)->array[i] < 127))
+            {
                 starting_point = i;
-            if ((*array)->array[i] > 32 && (*array)->array[i] < 127)
+                break;
+            }
+        }
+        // Note: Loop backwards until we get a valid character for a starting point.
+        for (int i = (*array)->current_num_col - 1; i > 0; --i) {
+            // Note: Once we find a character, break from the loop. 
+            if (((*array)->array[i] > 32 && (*array)->array[i] < 127))
+            {
                 ending_point = i;
+                break;
+            }
         }
         
-        // I tried the case of just using strncpy to move the content of the string to the beginning of the string but
+        // Note: I tried the case of just using strncpy to move the content of the string to the beginning of the string but
         // - this causes an issue in valgrind / low level memory. The error is: __strcpy_sse2_unaligned
         char * temp = calloc(((*array)->current_num_col - starting_point) + 1, sizeof(char));
         strncpy(temp, &(*array)->array[starting_point], (*array)->current_num_col - starting_point);
@@ -669,10 +748,14 @@ int sremove_leading_and_trailing_spaces(string ** array) {
         sadd(array, "string", temp);
         free(temp);
 
+        // Note: Determine how many white spaces were removed from the begining of the string.
         ending_point -= starting_point;
+        // Note: Subtract the number of spaces were removed from the beginning.
         (*array)->current_num_col -= starting_point;                       
+        // Note: Add a null terminator to where the ending point was found on the string.
         (*array)->array[ending_point + 1] = '\0';
-        // Have to add a one to the ending point since it is zero based, and have to convert it to one base.
+
+        // Note: Have to add a one to the ending point since it is zero based, and have to convert it to one base.
         (*array)->current_num_col -= ((*array)->current_num_col - (ending_point + 1));
 
         if (string_debugger_flag) printf("Leaving the sremove_leading_and_trailing_spaces funtion.\n");

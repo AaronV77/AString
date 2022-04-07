@@ -40,6 +40,8 @@ int strunc(string ** array, int position, char character);
 
 int schar_delete(string ** array, char * remove_characters);
 
+int schar_single_delete(string ** array, int position);
+
 int schar_group_delete(string ** array, int starting_position, int ending_position);
 
 int sremove_leading_and_trailing_spaces(string ** array);
